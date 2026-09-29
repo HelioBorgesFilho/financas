@@ -2,11 +2,16 @@
 
 require_once __DIR__ . '/config/autoload.php';
 
+use core\Env;
+
+$envPath  = __DIR__ . '/.env';
+Env::load($envPath);
+
 header('Access-Control-Allow-Origin: *'); // em produçao usar = header('Access-Control-Allow-Origin: https://meusite.com');
 header('Content-Type: application/json');
 date_default_timezone_set("America/Sao_Paulo");
 
-$headers = apache_request_headers();
+$headers = apache_request_headers(); // retirar e levar para parte de autenticação
 
 $method  = $_SERVER['REQUEST_METHOD'];
 $uri     = $_SERVER['REQUEST_URI'];
