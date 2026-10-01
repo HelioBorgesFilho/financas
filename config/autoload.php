@@ -3,6 +3,13 @@
 spl_autoload_register(function ($class) {
     $baseDir = __DIR__ . '/../';
 
+    $migrate = explode('\\', $class, 2);
+
+    if($migrate[0] == 'migrations'){
+
+        $class = "database\\$class";
+    }
+
     $classPath = str_replace('\\', '/', $class) . '.php';
     
     $file = $baseDir . $classPath;
