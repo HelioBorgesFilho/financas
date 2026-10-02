@@ -14,12 +14,32 @@ class AuthMiddleware
         $this->jwtService = new JwtService();
     }
 
-    public function handle(?string $token): object
+    private function extractToken(array $headers): ?string
     {
-        if (!$token) {
-            throw new Exception('Token não informado');
+        $authorization = $headers['Authorization'] ?? '';
+        $parts = explode(' ', trim($authorization), 2);
+
+        if (
+            count($parts) !== 2 ||
+            strcasecmp($parts[0], 'Bearer') !== 0
+        ) {
+            return null;
         }
 
-        return $this->jwtService->validateJwt($token, $userId);
+        $token = trim($parts[1]);
+
+        return $token !== '' ? $token : null;
+    }
+
+    public function handle()
+    {
+        $headers = apache_request_headers();
+        $token = $this->extractToken($headers);
+
+        if ($token === null) {
+            throw new Exception('Token não informado ou formato inválido');
+        }
+
+        return $this->jwtService->validateJwt($token);
     }
 }

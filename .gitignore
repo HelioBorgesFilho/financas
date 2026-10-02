@@ -1,0 +1,10 @@
+# Dependências
+/vendor/
+/node_modules/
+
+# Logs
+*.log
+
+# Credenciais
+.env
+.env.*
