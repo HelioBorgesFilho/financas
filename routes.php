@@ -205,11 +205,10 @@ switch ($method) {
 
                 break;
 
-            case 'saude?mes=2026-09':
+            case 'saude':
+                if ($numberOfRoute === 2 && isset($_GET['mes'])) {
 
-                if ($numberOfRoute === 2) {
-
-                    $response = $controller->testeResponse(200, '/saude?mes=2026-09'); // teste, remover depois
+                    $response = $controller->testeResponse(200, '/saude?mes=' . $_GET['mes']); // teste, remover depois
 
                 } else {
                     $response = $controller->mainController('error');
