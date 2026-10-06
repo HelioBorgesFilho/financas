@@ -42,4 +42,16 @@ class AuthMiddleware
 
         return $this->jwtService->validateJwt($token);
     }
+
+    public function route($routes) {
+
+        $chosenRoute = [];
+
+        foreach($routes as $key => $route) {
+            
+            $chosenRoute[$key] = $route;
+        } 
+        return $chosenRoute;
+    }
+
 }
