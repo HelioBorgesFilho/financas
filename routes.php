@@ -26,6 +26,12 @@ switch ($method) {
 
         switch ($route[1]) {
 
+            case 'login':
+
+                $response = $controller->mainController('login', $content);
+
+                break;
+
             case 'lancamentos':
 
                 if ($numberOfRoute === 2) {
@@ -87,18 +93,16 @@ switch ($method) {
 
                 if ($numberOfRoute === 2) {
 
-                    $response = $controller->testeResponse(200, '/familia'); // teste, remover depois
-                } elseif ($route[2] === 'convites') {
+                    $response = $controller->mainController('familia'); // teste, remover depois
 
-                    if ($numberOfRoute === 3 && $route[2] === 'convites') {
+                } elseif ($numberOfRoute === 3 && $route[2] === 'convites') {
 
-                        $response = $controller->testeResponse(200, '/familia/convites'); // teste, remover depois
-                    } elseif ($numberOfRoute === 5 && $route[2] === 'convites' && ctype_digit($route[3]) && $route[4] === 'reenviar') {
+                    $response = $controller->testeResponse(200, '/familia/convites'); // teste, remover depois
 
-                        $response = $controller->testeResponse(200, '/familia/convites/{id}/reenviar'); // teste, remover depois
-                    } else {
-                        $response = $controller->mainController('error');
-                    }
+                } elseif ($numberOfRoute === 5 && $route[2] === 'convites' && ctype_digit($route[3]) && $route[4] === 'reenviar') {
+
+                    $response = $controller->testeResponse(200, '/familia/convites/{id}/reenviar'); // teste, remover depois
+
                 } else {
                     $response = $controller->mainController('error');
                 }
@@ -186,19 +190,14 @@ switch ($method) {
 
             case 'familia':
 
-                if ($route[1] === 'familia') {
+                if ($numberOfRoute === 2 && $route[1] === 'familia') {
 
-                    if ($numberOfRoute === 2 && $route[1] === 'familia') {
+                    $response = $controller->testeResponse(200, '/familia'); // teste, remover depois
 
-                        $response = $controller->testeResponse(200, '/familia'); // teste, remover depois
+                } elseif ($numberOfRoute === 4 && $route[1] === 'familia' && $route[2] === 'limite-mensal' && $route[3] === 'simulacao') {
 
-                    } elseif ($numberOfRoute === 4 && $route[1] === 'familia' && $route[2] === 'limite-mensal' && $route[3] === 'simulacao') {
+                    $response = $controller->testeResponse(200, '/familia/limite-mensal/simulacao'); // teste, remover depois
 
-                        $response = $controller->testeResponse(200, '/familia/limite-mensal/simulacao'); // teste, remover depois
-
-                    } else {
-                        $response = $controller->mainController('error');
-                    }
                 } else {
                     $response = $controller->mainController('error');
                 }
@@ -206,6 +205,7 @@ switch ($method) {
                 break;
 
             case 'saude':
+
                 if ($numberOfRoute === 2 && isset($_GET['mes'])) {
 
                     $response = $controller->testeResponse(200, '/saude?mes=' . $_GET['mes']); // teste, remover depois
@@ -218,23 +218,18 @@ switch ($method) {
 
             case 'limites-diarios':
 
-                if ($route[1] === 'limites-diarios') {
+                if ($numberOfRoute === 2 && $route[1] === 'limites-diarios') {
 
-                    if ($numberOfRoute === 2 && $route[1] === 'limites-diarios') {
+                    $response = $controller->testeResponse(200, '/limites-diarios'); // teste, remover depois
 
-                        $response = $controller->testeResponse(200, '/limites-diarios'); // teste, remover depois
+                } elseif ($numberOfRoute === 4 && ctype_digit($route[2]) && $route[3] === 'simulacao') {
 
-                    } elseif ($numberOfRoute === 4 && ctype_digit($route[2]) && $route[3] === 'simulacao') {
+                    $response = $controller->testeResponse(200, '/limites-diarios/{usuario_id}/simulacao'); // teste, remover depois
 
-                        $response = $controller->testeResponse(200, '/limites-diarios/{usuario_id}/simulacao'); // teste, remover depois
+                } elseif ($numberOfRoute === 4 && $route[2] === 'distribuir' && $route[3] === 'simulacao') {
 
-                    } elseif ($numberOfRoute === 4 && $route[2] === 'distribuir' && $route[3] === 'simulacao') {
+                    $response = $controller->testeResponse(200, '/limites-diarios/distribuir/simulGETacao'); // teste, remover depois
 
-                        $response = $controller->testeResponse(200, '/limites-diarios/distribuir/simulGETacao'); // teste, remover depois
-
-                    } else {
-                        $response = $controller->mainController('error');
-                    }
                 } else {
                     $response = $controller->mainController('error');
                 }
@@ -243,19 +238,14 @@ switch ($method) {
 
             case 'eu':
 
-                if ($route[1] === 'eu') {
+                if ($numberOfRoute === 2 && $route[1] === 'eu') {
 
-                    if ($numberOfRoute === 2 && $route[1] === 'eu') {
+                    $response = $controller->testeResponse(200, '/eu'); // teste, remover depois
 
-                        $response = $controller->testeResponse(200, '/eu'); // teste, remover depois
+                } elseif ($numberOfRoute === 3 && $route[2] === 'assinatura') {
 
-                    } elseif ($numberOfRoute === 3 && $route[2] === 'assinatura') {
+                    $response = $controller->testeResponse(200, '/eu/assinatura'); // teste, remover depois
 
-                        $response = $controller->testeResponse(200, '/eu/assinatura'); // teste, remover depois
-
-                    } else {
-                        $response = $controller->mainController('error');
-                    }
                 } else {
                     $response = $controller->mainController('error');
                 }

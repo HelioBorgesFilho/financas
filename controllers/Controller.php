@@ -2,6 +2,9 @@
 
 namespace controllers;
 
+use middleware\AuthMiddleware;
+use services\JwtService;
+
 class Controller
 {
 
@@ -10,7 +13,7 @@ class Controller
         return ['code' => $code, 'status' => ['message' => $message]];
     }
 
-    public function testeResponse($code, $message) // teste, remover depois
+    public function response($code, $message) // teste, remover depois
     {
         return ['code' => $code, 'status' => ['message' => $message]];
     }
@@ -25,28 +28,53 @@ class Controller
         return true;
     }
 
-    public function mainController($option, $data = [], $token = null)
+    public function mainController($option, $data = [])
     {
+        $AuthMiddleware = new AuthMiddleware;
 
         switch ($option) {
 
-            case '':
+            case 'familia':                
+
+                $return = $AuthMiddleware->handle();
+
+                if($return['status']){
+
+                    $response = $this->response(200, $return['message']);
+
+                }else{
+
+                    $response = $this->response(401, $return['message']);
+                }
 
                 break;
 
-            case ' ':
+            case 'login':
 
-                break;
+                if ($data['login'] != null && $data['password'] != null) {
 
-            case '  ':
+                    $JwtService = new JwtService;
 
-                break;
+                    $return = $JwtService->generateToken($data);
 
-            case '    ':
+                    $response = $this->response(200, $return);
 
-                break;
+                } elseif ($data['login'] == null && $data['password'] == null) {
 
-            case '   ':
+                    $response = $this->response(401, 'Login e senha incorretas!');
+
+                } elseif ($data['login'] == null) {
+
+                    $response = $this->response(401, 'Login incorreto!');
+                    
+                } elseif ($data['password'] == null) {
+
+                    $response = $this->response(401, 'Senha incorreta!');
+
+                } else{
+
+                    $response = $this->errorResponse(404, 'A requisição não foi encontrada!');
+                }
 
                 break;
 
