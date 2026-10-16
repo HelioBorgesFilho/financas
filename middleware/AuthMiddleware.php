@@ -3,7 +3,6 @@
 namespace middleware;
 
 use services\JwtService;
-use Exception;
 
 class AuthMiddleware
 {
@@ -37,10 +36,17 @@ class AuthMiddleware
         $token = $this->extractToken($headers);
 
         if ($token === null) {
-            throw new Exception('Token não informado ou formato inválido');
+            return ['status' => false, 'message' => 'Token não informado ou formato inválido'];
         }
 
-        return $this->jwtService->validateJwt($token);
+        $response = $this->jwtService->validateJwt($token);
+
+        if(!$response){
+
+            return ['status' => $response, 'message' => 'Token inválido'];
+        }
+
+        return ['status' => $response, 'message' => 'sucess'];
     }
 
     public function route($routes) {
