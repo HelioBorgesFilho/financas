@@ -1,6 +1,10 @@
 <?php
-
 require_once __DIR__ . '/config/autoload.php';
+
+use models\Lancamento;
+$Lancamento = new Lancamento;
+$Lancar = $Lancamento->carregar('10');
+
 
 use core\Env;
 
@@ -26,4 +30,4 @@ $routes = array_merge(['financas'], $segments);
 
 $content = json_decode(file_get_contents('php://input'), true);
 
-require_once __DIR__ . '/routes.php';
+require_once __DIR__ . '/routes/routes.php';
