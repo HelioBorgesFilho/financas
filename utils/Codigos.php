@@ -54,5 +54,6 @@ class Codigos
             }
 
         }
+        return ['Codigo erro não encontrado'];
     }
 }
