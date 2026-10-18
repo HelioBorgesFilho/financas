@@ -16,8 +16,7 @@ class Migrations {
     public function migrate ($sql) {
 
         $smtm = $this->db->prepare($sql);
-        $teste = $smtm->execute(); 
         
-        return $teste;
+        return $smtm->execute(); 
     }
 }
