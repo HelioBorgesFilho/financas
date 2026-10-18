@@ -13,7 +13,7 @@ class Usuarios {
         $this->db = Database::getConnection(); 
     }
 
-    public function cadastrar ($nome, $email, $senha, $idade, $codigoEmail, $codigoConvite){
+    public function cadastrar($nome, $email, $senha, $idade, $codigoEmail, $codigoConvite){
 
         try {
 
@@ -35,20 +35,6 @@ class Usuarios {
 
             return ['status' => false, 'mensagem' => $e->errorInfo];
         }
-    }
-
-    public function usuario($id){
-
-        $sql = 'SELECT * FROM usuarios WHERE id = :id';
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':id', $id);
-
-        $stmt->execute();
-
-        $usuario = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-        return $usuario;
     }
 
     public function atualizarInfo($id, $dados){
@@ -189,7 +175,7 @@ class Usuarios {
 
     public function detalhes($id){
 
-        $sql = 'SELECT id, nome, email, email_pendente, foto_url, cor, idade, papel, assinatura FROM usuarios WHERE id = :id';
+        $sql = 'SELECT id, nome, email, email_pendente, url_foto, cor, idade, assinatura FROM usuarios WHERE id = :id';
 
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':id', $id);

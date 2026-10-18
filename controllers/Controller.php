@@ -12,14 +12,41 @@ use utils\Codigos;
 class Controller
 {
 
-    private function errorResposta($code, $mensagem)
+    private function resposta($code, $mensagem)
     {
         return ['code' => $code, 'status' => ['mensagem' => $mensagem]];
     }
 
-    public function resposta($code, $mensagem) // teste, remover depois
-    {
-        return ['code' => $code, 'status' => ['mensagem' => $mensagem]];
+    public function camposObrigatorios($requisicao, $dados): array{
+
+        $campos = [
+            'cadastro' => ['nome' => 'obrigatorio', 'email' => 'obrigatorio', 'senha' => 'obrigatorio'],
+        ];
+
+        $array = [];
+
+        foreach($campos as $posicao => $campo){
+
+            if($posicao == $requisicao){
+
+                $array = $campo;
+            }
+        }
+
+        $arrayRetorno = [];
+
+        foreach($dados as $posicao => $dado){
+
+            if($array[$posicao] == 'obrigatorio'){
+
+                if($dado == null){
+
+                    $arrayRetorno[] = $posicao;
+                }
+            }
+        }
+
+        return $arrayRetorno;
     }
 
     public function checkingRoutes($route, $numberOfRoute)
@@ -101,7 +128,7 @@ class Controller
                     $resposta = $this->resposta(401, ['erro' => 'Senha incorreta!']);
                 } else {
 
-                    $resposta = $this->errorResposta(404, ['erro' =>'A requisição não foi encontrada!']);
+                    $resposta = $this->resposta(404, ['erro' =>'A requisição não foi encontrada!']);
                 }
 
                 break;
@@ -124,11 +151,11 @@ class Controller
 
                     if ($cadastrar['status']) {
 
-                        $usuario['dados'] = $Usuarios->usuario($cadastrar['usuario']);
+                        $usuario['dados'] = $Usuarios->detalhes($cadastrar['usuario']);
 
                         $mensagem = array_merge(['status' => $cadastrar['mensagem']], $usuario);
 
-                        $resposta = $this->resposta(201, $mensagem);
+                        $resposta = $this->resposta(202, $mensagem);
                     } else {
 
                         $erro = explode(' ', $cadastrar["mensagem"][2]);
@@ -136,46 +163,26 @@ class Controller
                         $Utils = new Codigos;
                         $retorno = $Utils->codigo($cadastrar);
 
-                        if(isset($erro[5]) == 'email'){
+                        $codigo = isset($erro[5]) == 'email' ? 'email_em_uso' : 'erro geral';
+                        $mensagem = $codigo == 'email_em_uso' ? 'Já existe uma conta com esse e-mail.' : $Utils->codigo($cadastrar);
 
-                            $codigo = 'email_em_uso';
-                        } else {
-
-                            $codigo = 'erro geral';
-                        }
-                        $modeloRespostaErro = $this->modeloRespostaErro($codigo, 'Já existe uma conta com esse e-mail.');
+                        $modeloRespostaErro = $this->modeloRespostaErro($codigo, $mensagem);
                         $resposta = $this->resposta($retorno["http"], $modeloRespostaErro);
                     }
                 } else {
 
                     if ($nome == null && $email == null && $senha == null && !is_int($idade)) {
 
-                        $resposta = $this->resposta(201, ['erro' => 'JSON mal formado!']);
+                        $resposta = $this->resposta(400, ['erro' => 'JSON mal formado!']);
 
                     } else {
 
-                        $arrayCampos = [];
-
-                        if ($nome == null) {
-
-                            $arrayCampos[] = 'nome';
-                        }
-                        if ($email == null) {
-
-                            $arrayCampos[] = 'email';
-                        }
-                        if ($senha == null) {
-
-                            $arrayCampos[] = 'senha';
-                        }
-                        if (!is_int($idade)) {
-
-                            $arrayCampos[] = 'idade';
-                        }
+                        $dados = ['nome' => $nome, 'email' => $email, 'senha' => $senha, 'idade' => $idade];
+                        $arrayCampos = $this->camposObrigatorios('cadastro', $dados);
 
                         $modeloRespostaErro = $this->modeloRespostaErro('validacao', 'Preencha os campos obrigatórios destacados.', $arrayCampos);
                         
-                        $resposta = $this->resposta(401, $modeloRespostaErro);
+                        $resposta = $this->resposta(422, $modeloRespostaErro);
                     }  
                 }
 
@@ -183,7 +190,7 @@ class Controller
 
             default:
 
-                $resposta = $this->errorResposta(404, 'A requisição não foi encontrada!');
+                $resposta = $this->resposta(404, 'A requisição não foi encontrada!');
         }
 
         return $resposta;
