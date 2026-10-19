@@ -11,6 +11,7 @@ class Database
     public static function getConnection()
     {
         $host     = Config::get('DB_HOST');
+        $port     = Config::get('DB_PORT', '3306');
         $db_name  = Config::get('DB_NAME');
         $username = Config::get('DB_USER');
         $password = Config::get('DB_PASS');
@@ -18,7 +19,7 @@ class Database
         if (self::$instance === null) {
             try {
                 self::$instance = new \PDO(
-                    "mysql:host=" . $host . ";dbname=" . $db_name . ";charset=utf8",
+                    "mysql:host=" . $host . ";port=" . $port . ";dbname=" . $db_name . ";charset=utf8",
                     $username,
                     $password
                 );
