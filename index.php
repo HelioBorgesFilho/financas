@@ -1,15 +1,14 @@
 <?php
 require_once __DIR__ . '/config/autoload.php';
-
-use models\Lancamento;
-$Lancamento = new Lancamento;
-$Lancar = $Lancamento->carregar('10');
-
-
 use core\Env;
 
 $envPath  = __DIR__ . '/.env';
 Env::load($envPath);
+
+use models\Lancamento;
+$Lancamento = new Lancamento;
+use models\FormaPagamento;
+$pagmento = new FormaPagamento;
 
 header('Access-Control-Allow-Origin: *'); // em produçao usar = header('Access-Control-Allow-Origin: https://meusite.com');
 header('Content-Type: application/json');

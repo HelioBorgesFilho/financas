@@ -17,72 +17,100 @@ class Lancamento
 
     public function carregar(int $id)
     {
+        try {
+            $sql = 'SELECT * FROM lancamentos WHERE id = :id';
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
+            $stmt->execute();
+            $dados = $stmt->fetch(\PDO::FETCH_ASSOC);
 
-        $sql = 'SELECT * FROM lancamentos WHERE id = :id';
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindvalue(':id', $id);
-        $stmt->execute();
-        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-        return $result;
+            return [
+                'status' => true,
+                'mensagem' => 'Lançamento carregado com sucesso.',
+                'dados' => $dados
+            ];
+        } catch (\PDOException $e) {
+            return [
+                'status' => false,
+                'mensagem' => $e->errorInfo,
+                'dados' => null
+            ];
+        }
     }
-
 
     public function salvar($data)
     {
-        $sql = 'INSERT INTO lancamentos (id, id_grupo, tipo, valor_centavos, descricao, local, forma_pagamento_id, data, categoria, em_nome_de_id, repeticao, comprovante_ids) 
-            VALUES (:id, :id_grupo, :tipo, :valor_centavos, :descricao, :local, :forma_pagamento_id, :data, :categoria, :em_nome_de_id, :repeticao, :comprovante_ids   ) 
-            ON DUPLICATE KEY UPDATE lancamentos = lancamentos + 1';
+        try {
+            $sql = 'INSERT INTO lancamentos (tipo, descricao, local, forma_pagamento_id, data, data_edicao, categoria_id, usuario_lancamento_id, usuario_atrubuido_id, repeticao, comprovante_ids) VALUES (:tipo, :descricao, :local, :forma_pagamento_id, :data, :data_edicao, :categoria_id, :usuario_lancamento_id, :usuario_atrubuido_id, :repeticao, :comprovante_ids)';
 
+            $stmt = $this->db->prepare($sql);
+            $status = $stmt->execute([
+                ':tipo' => $data['tipo'],
+                ':descricao' => $data['descricao'],
+                ':local' => $data['local'],
+                ':forma_pagamento_id' => $data['forma_pagamento_id'],
+                ':data' => $data['data'],
+                ':data_edicao' => $data['data_edicao'],
+                ':categoria_id' => $data['categoria_id'],
+                ':usuario_lancamento_id' => $data['usuario_lancamento_id'],
+                ':usuario_atrubuido_id' => $data['usuario_atrubuido_id'],
+                ':repeticao' => $data['repeticao'],
+                ':comprovante_ids' => $data['comprovante_ids']
+            ]);
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':id', $data->id);
-        $stmt->bindValue(':id_grupo', $data->id_grupo);
-        $stmt->bindValue(':tipo', $data->tipo);
-        $stmt->bindValue(':valor_centavos', $data->valor_centavos);
-        $stmt->bindValue(':descricao', $data->descricao);
-        $stmt->bindValue(':local', $data->local);
-        $stmt->bindValue(':forma_pagamento_id', $data->forma_pagamento_id);
-        $stmt->bindValue(':data', $data->data);
-        $stmt->bindValue(':categoria', $data->categoria);
-        $stmt->bindValue(':em_nome_de_id', $data->em_nome_de_id);
-        $stmt->bindValue(':repeticao', $data->repeticao);
-        $stmt->bindValue(':comprovante_ids', $data->comprovante_ids);
-        $stmt->execute();
-
-        return  $this->db->lastInsertId();
+            return [
+                'status' => $status,
+                'mensagem' => $status ? 'Lançamento salvo com sucesso.' : 'Erro ao salvar lançamento.',
+                'id_inserido' => $this->db->lastInsertId()
+            ];
+        } catch (\PDOException $e) {
+            return [
+                'status' => false,
+                'mensagem' => $e->errorInfo,
+                'id_inserido' => null
+            ];
+        }
     }
-
-
-
 
     public function excluir(int $id)
     {
-        $sql = "UPDATE lancamentos SET deletado = 1 WHERE id = :id";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
-        return $stmt->execute();
+        try {
+            $sql = "DELETE FROM lancamentos WHERE id = :id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
+            $status = $stmt->execute();
+
+            return [
+                'status' => $status,
+                'mensagem' => $status ? 'Lançamento excluído com sucesso.' : 'Erro ao excluir lançamento.'
+            ];
+        } catch (\PDOException $e) {
+            return [
+                'status' => false,
+                'mensagem' => $e->errorInfo
+            ];
+        }
     }
 
-    public static function listarPorGrupo(?int $id_grupo = null): array
+    public function listar()
     {
-        $sql = "SELECT id, id_grupo, tipo, valor_centavos, descricao, local, forma_pagamento_id, data, categoria, em_nome_de_id, repeticao, comprovante_ids FROM lancamentos";
+        try {
+            $sql = "SELECT * FROM lancamentos ORDER BY id DESC";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            $dados = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        if ($id_grupo != null) {
-            $sql .= ' WHERE id_grupo = :id_grupo';
+            return [
+                'status' => true,
+                'mensagem' => 'Lançamentos listados com sucesso.',
+                'dados' => $dados
+            ];
+        } catch (\PDOException $e) {
+            return [
+                'status' => false,
+                'mensagem' => $e->errorInfo,
+                'dados' => []
+            ];
         }
-
-        $sql .= ' ORDER BY criado_em DESC';
-
-        $stmt = self::$db->prepare($sql);
-
-        if ($id_grupo != null) {
-            $stmt->bindValue(':id_grupo', $id_grupo, \PDO::PARAM_INT);
-        }
-
-        $stmt->execute();
-
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 }
-
