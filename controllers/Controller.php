@@ -21,23 +21,30 @@ class Controller
 
         $campos = [
             'cadastro' => ['nome' => 'obrigatorio', 'email' => 'obrigatorio', 'senha' => 'obrigatorio'],
+            'login' => ['nome' => 'obrigatorio', 'email' => 'obrigatorio', 'senha' => 'obrigatorio'],
         ];
 
-        $array = [];
+        $campoSelecionado = [];
 
         foreach($campos as $posicao => $campo){
 
-            if($posicao == $requisicao){
+            if($campos[$posicao]){
 
-                $array = $campo;
-            }
+                if($posicao == $requisicao){
+
+                    $campoSelecionado = $campo;
+                }
+            }else{
+
+                $campoSelecionado = $campo;
+            }            
         }
 
         $arrayRetorno = [];
 
         foreach($dados as $posicao => $dado){
 
-            if($array[$posicao] == 'obrigatorio'){
+            if($campoSelecionado[$posicao] == 'obrigatorio'){
 
                 if($dado == null){
 
@@ -49,28 +56,28 @@ class Controller
         return $arrayRetorno;
     }
 
-    public function checkingRoutes($route, $numberOfRoute)
-    {
-        if ($numberOfRoute < 1 || $numberOfRoute > 10) {
-            return false;
-        }
-        return true;
-    }
+    public function mensagensPadraoErro($nomeMensagem){
 
-    public function mensagensPadrao($nomeMensagem){
+        $mensagens = [
+            'nome' => 'Informe um nome com pelo menos 2 letras.',
+            'email' => 'Informe o e-mail.',
+            'senha' => 'Use pelo menos 8 caracteres.', 
+            'idade' => 'Informe sua idade.',
+        ];
 
-        $array = ['nome' => 'Informe um nome com pelo menos 2 letras.',
-         'email' => 'Informe o e-mail.',
-         'senha' => 'Use pelo menos 8 caracteres.', 
-         'idade' => 'Informe sua idade.'];
+        $mensagem = 'Campo não encontrado, contato dezenvolvedor.';
 
-        $mensagem = 'campo não encontrado, adicionar';
+        foreach($mensagens as $posicao => $msg){
 
-        foreach($array as $posicao => $msg){
+            if($mensagens[$posicao]){
 
-            if($posicao == $nomeMensagem){
+                if($posicao == $nomeMensagem){
 
-                $mensagem = $msg;
+                    $mensagem = $msg;
+                }
+            }else{
+
+                $mensagem = 'Campo não encontrado, contato dezenvolvedor.';
             }
         }
         return $mensagem;
@@ -78,23 +85,28 @@ class Controller
 
     public function modeloRespostaErro($codigo, $mensagem, $campos = null){
 
-        $arrayErro['erro'] = ['codigo' => $codigo, 'mensagem' => $mensagem];
+        $respostaErro['erro'] = ['codigo' => $codigo, 'mensagem' => $mensagem];
 
         if($campos){
 
-            foreach($campos as $posicao => $campo){
+            foreach($campos as $campo){                
 
-                if($campo == null){
-
-                    $arrayCampos[$posicao] = $this->mensagensPadrao($posicao);
-                }                
+                $camposSelecionados[$campo] = $this->mensagensPadraoErro($campo);
             }
         }
-        if(isset($arrayCampos)){
+        if(isset($camposSelecionados)){
 
-            $arrayErro['erro']['campos'] = $arrayCampos;
+            $respostaErro['erro']['campos'] = $camposSelecionados;
         }
-        return $arrayErro;       
+        return $respostaErro;       
+    }
+
+    public function checkingRoutes($route, $numberOfRoute)
+    {
+        if ($numberOfRoute < 1 || $numberOfRoute > 10) {
+            return false;
+        }
+        return true;
     }
 
     public function mainController($option, $data = [])
