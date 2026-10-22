@@ -59,15 +59,21 @@ class Controller
 
     public function mensagensPadrao($nomeMensagem){
 
-        $array = ['nome' => 'Informe um nome com pelo menos 2 letras.', 'email' => 'Informe o e-mail.','senha' => 'Use pelo menos 8 caracteres.', 'idade' => 'Informe sua idade.'];
+        $array = ['nome' => 'Informe um nome com pelo menos 2 letras.',
+         'email' => 'Informe o e-mail.',
+         'senha' => 'Use pelo menos 8 caracteres.', 
+         'idade' => 'Informe sua idade.'];
+
+        $mensagem = 'campo não encontrado, adicionar';
 
         foreach($array as $posicao => $msg){
 
             if($posicao == $nomeMensagem){
 
-                return $msg;
+                $mensagem = $msg;
             }
         }
+        return $mensagem;
     }
 
     public function modeloRespostaErro($codigo, $mensagem, $campos = null){
@@ -76,9 +82,12 @@ class Controller
 
         if($campos){
 
-            foreach($campos as $campo){
+            foreach($campos as $posicao => $campo){
 
-                $arrayCampos[$campo] = $this->mensagensPadrao($campo);
+                if($campo == null){
+
+                    $arrayCampos[$posicao] = $this->mensagensPadrao($posicao);
+                }                
             }
         }
         if(isset($arrayCampos)){
@@ -110,25 +119,27 @@ class Controller
 
             case 'login':
 
-                if ($data['login'] != null && $data['password'] != null) {
+                $email = trim($data['email']);
+                $senha = trim($data['senha']);
+
+                if ($data['email'] != null && $data['senha'] != null) {
 
                     $JwtService = new JwtService;
 
-                    $return = $JwtService->generateToken($data);
+                    $user['id'] = 1;
+                    $user['email'] = 'lucas.rios.se@gmail.com';
 
-                    $resposta = $this->resposta(200, $return);
-                } elseif ($data['login'] == null && $data['password'] == null) {
+                    $token = $JwtService->generateToken($user);
 
-                    $resposta = $this->resposta(401, ['erro' => 'Login e senha incorretas!']);
-                } elseif ($data['login'] == null) {
+                    $resposta = $this->resposta(200, $token);
 
-                    $resposta = $this->resposta(401, ['erro' =>'Login incorreto!']);
-                } elseif ($data['password'] == null) {
-
-                    $resposta = $this->resposta(401, ['erro' => 'Senha incorreta!']);
                 } else {
 
-                    $resposta = $this->resposta(404, ['erro' =>'A requisição não foi encontrada!']);
+                    $campos = $dados = ['email' => $email, 'senha' => $senha];
+
+                    $modeloRespostaErro = $this->modeloRespostaErro('validação', 'Preencha os campos obrigatórios destacados.', $campos);
+
+                    $resposta = $this->resposta(422, ['erro' => $modeloRespostaErro]);
                 }
 
                 break;
