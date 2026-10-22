@@ -17,11 +17,11 @@ class JwtService
         $header = json_encode($header);
         $header = base64_encode($header);
 
-        $expiration = time() + (3 * 60 * 60);
+        $expiration = time() + (30 * 24 * 60 * 60);
 
         $payload = [
-            'userid' => $user['login'],
-            'username' => $user['password'],
+            'userid' => $user['id'],
+            'email' => $user['email'],
             'exp' => $expiration
         ];
 

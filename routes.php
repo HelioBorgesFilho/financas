@@ -26,12 +26,6 @@ switch ($method) {
 
         switch ($route[1]) {
 
-            case 'login':
-
-                $response = $controller->mainController('login', $content);
-
-                break;
-
             case 'lancamentos':
 
                 if ($numberOfRoute === 2) {
@@ -124,7 +118,8 @@ switch ($method) {
 
                 if ($numberOfRoute === 3 && $route[2] === 'login') {
 
-                    $response = $controller->resposta(200, '/auth/login'); // teste, remover depois
+                    $response = $controller->mainController('login', $content); // teste, remover depois
+
                 } elseif ($numberOfRoute === 3 && $route[2] === 'google') {
 
                     $response = $controller->resposta(200, '/auth/google'); // teste, remover depois
