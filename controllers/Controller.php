@@ -3,16 +3,16 @@
 namespace controllers;
 
 use middleware\AuthMiddleware;
-use services\JwtService;
 use utils\GeradorCodigoEmail;
 use models\Usuarios;
 use utils;
 use utils\Codigos;
+use controllers\Logar;
 
 class Controller
 {
 
-    private function resposta($code, $mensagem)
+    public function resposta($code, $mensagem)
     {
         return ['code' => $code, 'status' => ['mensagem' => $mensagem]];
     }
@@ -119,28 +119,9 @@ class Controller
 
             case 'login':
 
-                $email = trim($data['email']);
-                $senha = trim($data['senha']);
+                $Logar = new Logar;
 
-                if ($data['email'] != null && $data['senha'] != null) {
-
-                    $JwtService = new JwtService;
-
-                    $user['id'] = 1;
-                    $user['email'] = 'lucas.rios.se@gmail.com';
-
-                    $token = $JwtService->generateToken($user);
-
-                    $resposta = $this->resposta(200, $token);
-
-                } else {
-
-                    $campos = $dados = ['email' => $email, 'senha' => $senha];
-
-                    $modeloRespostaErro = $this->modeloRespostaErro('validação', 'Preencha os campos obrigatórios destacados.', $campos);
-
-                    $resposta = $this->resposta(422, ['erro' => $modeloRespostaErro]);
-                }
+                $resposta = $Logar->logando($data);               
 
                 break;
 

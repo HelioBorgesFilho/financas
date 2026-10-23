@@ -6,7 +6,7 @@ class JwtService
 {
     private $secret = 'XAPOIDJJ8sd83auhuigs';
 
-    public function generateToken($user)
+    public function generateToken($usuario)
     {
 
         $header = [
@@ -17,12 +17,12 @@ class JwtService
         $header = json_encode($header);
         $header = base64_encode($header);
 
-        $expiration = time() + (30 * 24 * 60 * 60);
+        $expiracao = time() + (30 * 24 * 60 * 60);
 
         $payload = [
-            'userid' => $user['id'],
-            'email' => $user['email'],
-            'exp' => $expiration
+            'userid' => $usuario['id'],
+            'email' => $usuario['email'],
+            'exp' => $expiracao
         ];
 
         $payload = json_encode($payload);
@@ -32,7 +32,7 @@ class JwtService
         $signature = base64_encode($signature);
 
         $token = $header . '.' . $payload . '.' . $signature;
-        return $token;
+        return ['token' => $token, 'expiracao' => $expiracao];
     }
 
     public function validateJwt($token, $userId = null) : array
