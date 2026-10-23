@@ -37,7 +37,7 @@ class FormaPagamento
 
             return [
                 'status' => true,
-                'mensagem' => 'Forma de pagamento cadastrada com sucesso.'
+                'id' => $this->db->lastInsertId()
             ];
         } catch (PDOException $e) {
             return [
@@ -62,10 +62,9 @@ class FormaPagamento
             ]);
 
             return [
-                'status' => true,
-                'mensagem' => 'Forma de pagamento atualizada com sucesso.'
+                'status' => true
             ];
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             return [
                 'status' => false,
                 'mensagem' => $e->errorInfo
@@ -76,16 +75,14 @@ class FormaPagamento
     {
         try {
             $sql = 'UPDATE forma_pagamento SET deletada = 1 WHERE id = :id';
-
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
             $status = $stmt->execute();
 
             return [
-                'status' => $status,
-                'mensagem' => $status ? 'Forma de pagamento removida com sucesso.' : 'Erro ao remover forma de pagamento.'
+                'status' => true
             ];
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             return [
                 'status' => false,
                 'mensagem' => $e->errorInfo
@@ -96,21 +93,18 @@ class FormaPagamento
     {
         try {
             $sql = 'SELECT * FROM forma_pagamento';
-
             $stmt = $this->db->prepare($sql);
             $stmt->execute();
             $dados = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
             return [
                 'status' => true,
-                'mensagem' => 'Formas de pagamento listadas com sucesso.',
-                'dados' => $dados
+                'mensagem' => $dados
             ];
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             return [
                 'status' => false,
-                'mensagem' => $e->errorInfo,
-                'dados' => []
+                'mensagem' => $e->errorInfo
             ];
         }
     }
@@ -118,22 +112,19 @@ class FormaPagamento
     {
         try {
             $sql = 'SELECT * FROM forma_pagamento WHERE id = :id';
-
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
             $status = $stmt->execute();
             $dados = $stmt->fetch(\PDO::FETCH_ASSOC);
 
             return [
-                'status' => $status,
-                'mensagem' => $dados ? 'Detalhes recuperados com sucesso.' : 'Nenhum registro encontrado.',
-                'dados' => $dados
+                'status' => true,
+                'mensagem' => $dados ?: []
             ];
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             return [
                 'status' => false,
-                'mensagem' => $e->errorInfo,
-                'dados' => null
+                'mensagem' => $e->errorInfo
             ];
         }
     }

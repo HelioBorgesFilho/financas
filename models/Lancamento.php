@@ -26,14 +26,12 @@ class Lancamento
 
             return [
                 'status' => true,
-                'mensagem' => 'Lançamento carregado com sucesso.',
-                'dados' => $dados
+                'mensagem' => $dados ?: []
             ];
         } catch (\PDOException $e) {
             return [
                 'status' => false,
-                'mensagem' => $e->errorInfo,
-                'dados' => null
+                'mensagem' => $e->errorInfo
             ];
         }
     }
@@ -59,15 +57,13 @@ class Lancamento
             ]);
 
             return [
-                'status' => $status,
-                'mensagem' => $status ? 'Lançamento salvo com sucesso.' : 'Erro ao salvar lançamento.',
-                'id_inserido' => $this->db->lastInsertId()
+                'status' => true,
+                'id' => $this->db->lastInsertId()
             ];
         } catch (\PDOException $e) {
             return [
                 'status' => false,
-                'mensagem' => $e->errorInfo,
-                'id_inserido' => null
+                'mensagem' => $e->errorInfo
             ];
         }
     }
@@ -81,8 +77,7 @@ class Lancamento
             $status = $stmt->execute();
 
             return [
-                'status' => $status,
-                'mensagem' => $status ? 'Lançamento excluído com sucesso.' : 'Erro ao excluir lançamento.'
+                'status' => true
             ];
         } catch (\PDOException $e) {
             return [
@@ -102,14 +97,12 @@ class Lancamento
 
             return [
                 'status' => true,
-                'mensagem' => 'Lançamentos listados com sucesso.',
-                'dados' => $dados
+                'mensagem' => $dados
             ];
         } catch (\PDOException $e) {
             return [
                 'status' => false,
-                'mensagem' => $e->errorInfo,
-                'dados' => []
+                'mensagem' => $e->errorInfo
             ];
         }
     }
