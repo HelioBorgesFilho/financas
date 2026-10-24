@@ -17,11 +17,11 @@ class JwtService
         $header = json_encode($header);
         $header = base64_encode($header);
 
-        $expiration = time() + (3 * 60 * 60);
+        $expiration = time() + (30 * 24 * 60 * 60);
 
         $payload = [
             'userid' => $user['id'],
-            'username' => $user['name'],
+            'email' => $user['email'],
             'exp' => $expiration
         ];
 
@@ -35,12 +35,12 @@ class JwtService
         return $token;
     }
 
-    public function validateJwt($token, $userId = null)
+    public function validateJwt($token, $userId = null) : array
     {
 
         $parts = explode('.', $token);
         if (count($parts) !== 3) {
-            return false;
+            return ['status' => true, 'message' => 'Token invalido!'];
         }
 
         list($headerEncoded, $payloadEncoded, $signatureProvided) = $parts;
@@ -49,26 +49,26 @@ class JwtService
         $expectedSignatureEncoded = base64_encode($expectedSignature);
 
         if ($expectedSignatureEncoded !== $signatureProvided) {
-            return false;
+            return ['status' => false, 'message' => 'Token incorreto!'];
         }
 
         $payloadJson = base64_decode($payloadEncoded);
         $payload = json_decode($payloadJson, true);
 
         if (!$payload) {
-            return false;
+            return ['status' => false, 'message' => 'Dados invalidos!'];
         }
 
         if($userId != null){
             if($payload['userid'] != $userId){
-                return false;
+                return ['status' => false, 'message' => 'Dados invalidos!'];
             }
         }
 
         if (isset($payload['exp']) && time() > $payload['exp']) {
-            return false;
+            return ['status' => false, 'message' => 'Expirado'];
         }
 
-        return true;
+        return ['status' => true, 'message' => 'success'];
     }
 }

@@ -11,7 +11,7 @@ class Database
     public static function getConnection()
     {
         $host     = Config::get('DB_HOST');
-        $port     = Config::get('DB_PORT');
+        $port     = Config::get('DB_PORT', '3306');
         $db_name  = Config::get('DB_NAME');
         $username = Config::get('DB_USER');
         $password = Config::get('DB_PASS');
