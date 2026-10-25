@@ -5,9 +5,8 @@ namespace controllers;
 use middleware\AuthMiddleware;
 use utils\GeradorCodigoEmail;
 use models\Usuarios;
-use utils;
 use utils\Codigos;
-use controllers\Logar;
+use services\AuthService;
 
 class Controller
 {
@@ -119,9 +118,9 @@ class Controller
 
             case 'login':
 
-                $Logar = new Logar;
+                $AuthService = new AuthService;
 
-                $resposta = $Logar->logando($data);               
+                $resposta = $AuthService->logando($data);               
 
                 break;
 
@@ -177,6 +176,14 @@ class Controller
                         $resposta = $this->resposta(422, $modeloRespostaErro);
                     }  
                 }
+
+                break;
+
+            case 'renovar':
+
+                $sessaoAberta = AuthService::sessaoAberta();
+
+                $resposta = $this->resposta($sessaoAberta['code'], $sessaoAberta['mensagem']);
 
                 break;
 

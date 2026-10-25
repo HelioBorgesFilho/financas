@@ -1,11 +1,13 @@
 <?php
 
-namespace controllers;
+namespace services;
 
 use services\JwtService;
 use models\Usuarios;
+use config\Session;
+use controllers\Controller;
 
-class Logar {
+class AuthService {
 
     public function logando($data){
 
@@ -25,6 +27,15 @@ class Logar {
                 $JwtService = new JwtService;
 
                 $gerador = $JwtService->generateToken($usuario);
+
+                session_regenerate_id(true);
+
+                $duracao = 30 * 24 * 60 * 60; // 30 dias
+
+                session_regenerate_id(true);
+
+                $_SESSION['usuario_id'] = $usuario['id'];
+                $_SESSION['expira_em'] = time() + $duracao;
 
                 $expiracao = date('c', $gerador['expiracao']);
 
@@ -67,5 +78,23 @@ class Logar {
         $resposta = $Controller->resposta($codigo, $mensagem);
 
         return $resposta;   
+    }
+
+    public static function sessaoAberta(){
+
+        $session = Session::verificarSessao();        
+
+        if($session['logado']){
+
+            $Usuarios = new Usuarios;
+            $JwtService = new JwtService;            
+
+            $usuario = $Usuarios->detalhes($session["usuario_id"]);
+            $token = $JwtService->generateToken($usuario);            
+            return ['code' => 200, 'mensagem' => $token];
+        }else{
+
+            return ['code' => 401, 'mensagem' => 'Autenticação expirada.'];
+        }
     }
 }

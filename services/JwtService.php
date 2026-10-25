@@ -6,7 +6,7 @@ class JwtService
 {
     private $secret = 'XAPOIDJJ8sd83auhuigs';
 
-    public function generateToken($usuario)
+    public function generateToken( array $usuario) : array
     {
 
         $header = [
@@ -35,7 +35,7 @@ class JwtService
         return ['token' => $token, 'expiracao' => $expiracao];
     }
 
-    public function validateJwt($token, $userId = null) : array
+    public function validateJwt(string $token, $userId = null) : array
     {
 
         $parts = explode('.', $token);
