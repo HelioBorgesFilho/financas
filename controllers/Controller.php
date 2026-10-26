@@ -5,13 +5,13 @@ namespace controllers;
 use middleware\AuthMiddleware;
 use utils\GeradorCodigoEmail;
 use models\Usuarios;
+use controllers\Validacao;
 use utils\Codigos;
-use services\AuthService;
 
 class Controller
 {
 
-    public function resposta($code, $mensagem)
+    private function resposta($code, $mensagem)
     {
         return ['code' => $code, 'status' => ['mensagem' => $mensagem]];
     }
@@ -56,49 +56,10 @@ class Controller
         return true;
     }
 
-    public function mensagensPadrao($nomeMensagem){
-
-        $array = ['nome' => 'Informe um nome com pelo menos 2 letras.',
-         'email' => 'Informe o e-mail.',
-         'senha' => 'Use pelo menos 8 caracteres.', 
-         'idade' => 'Informe sua idade.'];
-
-        $mensagem = 'campo não encontrado, adicionar';
-
-        foreach($array as $posicao => $msg){
-
-            if($posicao == $nomeMensagem){
-
-                $mensagem = $msg;
-            }
-        }
-        return $mensagem;
-    }
-
-    public function modeloRespostaErro($codigo, $mensagem, $campos = null){
-
-        $arrayErro['erro'] = ['codigo' => $codigo, 'mensagem' => $mensagem];
-
-        if($campos){
-
-            foreach($campos as $posicao => $campo){
-
-                if($campo == null){
-
-                    $arrayCampos[$posicao] = $this->mensagensPadrao($posicao);
-                }                
-            }
-        }
-        if(isset($arrayCampos)){
-
-            $arrayErro['erro']['campos'] = $arrayCampos;
-        }
-        return $arrayErro;       
-    }
-
     public function mainController($option, $data = [])
     {
         $AuthMiddleware = new AuthMiddleware;
+        $Resposta = new Resposta;
 
         switch ($option) {
 
@@ -108,10 +69,10 @@ class Controller
 
                 if ($return['status']) {
 
-                    $resposta = $this->resposta(200, $return['mensagem']);
+                    $resposta = $Resposta->resposta(200, $return['mensagem']);
                 } else {
 
-                    $resposta = $this->resposta(401, $return['mensagem']);
+                    $resposta = $Resposta->resposta(401, $return['mensagem']);
                 }
 
                 break;
@@ -120,7 +81,21 @@ class Controller
 
                 $AuthService = new AuthService;
 
-                $resposta = $AuthService->logando($data);               
+                    $user['id'] = 1;
+                    $user['email'] = 'lucas.rios.se@gmail.com';
+
+                    $token = $JwtService->generateToken($user);
+
+                    $resposta = $this->resposta(200, $token);
+
+                } else {
+
+                    $campos = $dados = ['email' => $email, 'senha' => $senha];
+
+                    $modeloRespostaErro = $this->modeloRespostaErro('validação', 'Preencha os campos obrigatórios destacados.', $campos);
+
+                    $resposta = $this->resposta(422, ['erro' => $modeloRespostaErro]);
+                }
 
                 break;
 
@@ -146,7 +121,7 @@ class Controller
 
                         $mensagem = array_merge(['status' => $cadastrar['mensagem']], $usuario);
 
-                        $resposta = $this->resposta(202, $mensagem);
+                        $resposta = $Resposta->resposta(202, $mensagem);
                     } else {
 
                         $erro = explode(' ', $cadastrar["mensagem"][2]);
@@ -157,23 +132,25 @@ class Controller
                         $codigo = isset($erro[5]) == 'email' ? 'email_em_uso' : 'erro geral';
                         $mensagem = $codigo == 'email_em_uso' ? 'Já existe uma conta com esse e-mail.' : $Utils->codigo($cadastrar);
 
-                        $modeloRespostaErro = $this->modeloRespostaErro($codigo, $mensagem);
-                        $resposta = $this->resposta($retorno["http"], $modeloRespostaErro);
+                        $modeloRespostaErro = $Resposta->modeloRespostaErro($codigo, $mensagem);
+                        $resposta = $Resposta->resposta($retorno["http"], $modeloRespostaErro);
                     }
                 } else {
 
                     if ($nome == null && $email == null && $senha == null && !is_int($idade)) {
 
-                        $resposta = $this->resposta(400, ['erro' => 'JSON mal formado!']);
+                        $resposta = $Resposta->resposta(400, ['erro' => 'JSON mal formado!']);
 
                     } else {
 
-                        $dados = ['nome' => $nome, 'email' => $email, 'senha' => $senha, 'idade' => $idade];
-                        $arrayCampos = $this->camposObrigatorios('cadastro', $dados);
+                        $Validacao = new Validacao;
 
-                        $modeloRespostaErro = $this->modeloRespostaErro('validacao', 'Preencha os campos obrigatórios destacados.', $arrayCampos);
+                        $dados = ['nome' => $nome, 'email' => $email, 'senha' => $senha, 'idade' => $idade];
+                        $arrayCampos = $Validacao->camposObrigatorios('cadastro', $dados);
+
+                        $modeloRespostaErro = $Resposta->modeloRespostaErro('validacao', 'Preencha os campos obrigatórios destacados.', $arrayCampos);
                         
-                        $resposta = $this->resposta(422, $modeloRespostaErro);
+                        $resposta = $Resposta->resposta(422, $modeloRespostaErro);
                     }  
                 }
 
@@ -189,7 +166,7 @@ class Controller
 
             default:
 
-                $resposta = $this->resposta(404, 'A requisição não foi encontrada!');
+                $resposta = $Resposta->resposta(404, 'A requisição não foi encontrada!');
         }
 
         return $resposta;
