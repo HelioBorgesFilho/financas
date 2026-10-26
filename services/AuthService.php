@@ -5,13 +5,13 @@ namespace services;
 use services\JwtService;
 use models\Usuarios;
 use config\Session;
-use controllers\Controller;
+use controllers\Resposta;
 
 class AuthService {
 
     public function logando($data){
 
-        $Controller = new Controller;
+        $Resposta = new Resposta;
 
         $email = trim($data['email']);
         $senha = trim($data['senha']);
@@ -57,25 +57,25 @@ class AuthService {
                 $codigo = 200;
             } else {
 
-                $mensagem = $Controller->modeloRespostaErro('credenciais_invalidas', 'E-mail ou senha incorretos.');
+                $mensagem = $Resposta->modeloRespostaErro('credenciais_invalidas', 'E-mail ou senha incorretos.');
                 $codigo = 401;
             }
         } else {
 
             if ($data['email'] == null && $data['senha'] == null) {
                 
-                $mensagem = $Controller->modeloRespostaErro('validação', 'JSON mal formado!');
+                $mensagem = $Resposta->modeloRespostaErro('validação', 'JSON mal formado!');
                 $codigo = 400;
             }else{
 
                 $campos = ['email' => $email, 'senha' => $senha];
 
-                $mensagem = $Controller->modeloRespostaErro('validação', 'Preencha os campos obrigatórios destacados.', $campos);
+                $mensagem = $Resposta->modeloRespostaErro('validação', 'Preencha os campos obrigatórios destacados.', $campos);
                 $codigo = 422;
             }
         }
 
-        $resposta = $Controller->resposta($codigo, $mensagem);
+        $resposta = $Resposta->resposta($codigo, $mensagem);
 
         return $resposta;   
     }
