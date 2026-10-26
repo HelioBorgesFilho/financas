@@ -8,6 +8,7 @@ use models\Usuarios;
 use controllers\Validacao;
 use utils\Codigos;
 use controllers\Resposta;
+use controllers\UsuariosController;
 use services\AuthService;
 
 class Controller
@@ -44,9 +45,8 @@ class Controller
 
             case 'login':
 
-                $AuthService = new AuthService;
-
-                $resposta = $AuthService->logando($data); 
+                $UsuariosController = new UsuariosController;
+                $resposta = $UsuariosController->validarLog($data); 
 
                 break;
 

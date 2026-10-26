@@ -5,94 +5,58 @@ namespace services;
 use services\JwtService;
 use models\Usuarios;
 use config\Session;
-use controllers\Resposta;
 
-class AuthService {
+class AuthService
+{
 
-    public function logando($data){
+    public function logando(array $usuario) : array
+    {
 
-        $Resposta = new Resposta;
+        $JwtService = new JwtService;
 
-        $email = trim($data['email']);
-        $senha = trim($data['senha']);
+        $gerador = $JwtService->generateToken($usuario);
 
-        if ($data['email'] != null && $data['senha'] != null) {
+        session_regenerate_id(true);
+        $duracao = 30 * 24 * 60 * 60;
 
-            $Usuarios = new Usuarios;
+        $_SESSION['usuario_id'] = $usuario['id'];
+        $_SESSION['expira_em'] = time() + $duracao;
 
-            $usuario = $Usuarios->usuario($email);
+        $expiracao = date('c', $gerador['expiracao']);
 
-            if ($email == $usuario['email'] && $senha == $usuario['senha']) {
-
-                $JwtService = new JwtService;
-
-                $gerador = $JwtService->generateToken($usuario);
-
-                session_regenerate_id(true);
-
-                $duracao = 30 * 24 * 60 * 60; // 30 dias
-
-                session_regenerate_id(true);
-
-                $_SESSION['usuario_id'] = $usuario['id'];
-                $_SESSION['expira_em'] = time() + $duracao;
-
-                $expiracao = date('c', $gerador['expiracao']);
-
-                $mensagem = [
-                    "token_acesso" => $gerador['token'],
-                    "token_acesso_expira_em" => $expiracao,
-                    "usuario" => [
-                      "id" => $usuario['id'],
-                      "nome" => $usuario['nome'],
-                      "email" => $usuario['email'],
-                      "email_pendente" => $usuario['email_pendente'],
-                      "foto_url" => $usuario['foto_url'],
-                      "cor" => $usuario['cor'],
-                      "idade" => $usuario['idade'],
-                      "papel" => "membro",
-                      "assinatura" => [ "plano" => "standard", "nome" => "Standard" ],
-                    ]
-                ];
-                $codigo = 200;
-            } else {
-
-                $mensagem = $Resposta->modeloRespostaErro('credenciais_invalidas', 'E-mail ou senha incorretos.');
-                $codigo = 401;
-            }
-        } else {
-
-            if ($data['email'] == null && $data['senha'] == null) {
-                
-                $mensagem = $Resposta->modeloRespostaErro('validação', 'JSON mal formado!');
-                $codigo = 400;
-            }else{
-
-                $campos = ['email' => $email, 'senha' => $senha];
-
-                $mensagem = $Resposta->modeloRespostaErro('validação', 'Preencha os campos obrigatórios destacados.', $campos);
-                $codigo = 422;
-            }
-        }
-
-        $resposta = $Resposta->resposta($codigo, $mensagem);
-
-        return $resposta;   
+        $mensagem = [
+            "token_acesso" => $gerador['token'],
+            "token_acesso_expira_em" => $expiracao,
+            "usuario" => [
+                "id" => $usuario['id'],
+                "nome" => $usuario['nome'],
+                "email" => $usuario['email'],
+                "email_pendente" => $usuario['email_pendente'],
+                "foto_url" => $usuario['foto_url'],
+                "cor" => $usuario['cor'],
+                "idade" => $usuario['idade'],
+                "papel" => "membro",
+                "assinatura" => ["plano" => "standard", "nome" => "Standard"],
+            ]
+        ];
+        
+        return ['mensagem' => $mensagem];
     }
 
-    public static function sessaoAberta(){
+    public static function sessaoAberta()
+    {
 
-        $session = Session::verificarSessao();        
+        $session = Session::verificarSessao();
 
-        if($session['logado']){
+        if ($session['logado']) {
 
             $Usuarios = new Usuarios;
-            $JwtService = new JwtService;            
+            $JwtService = new JwtService;
 
             $usuario = $Usuarios->detalhes($session["usuario_id"]);
-            $token = $JwtService->generateToken($usuario);            
+            $token = $JwtService->generateToken($usuario);
             return ['code' => 200, 'mensagem' => $token];
-        }else{
+        } else {
 
             return ['code' => 401, 'mensagem' => 'Autenticação expirada.'];
         }

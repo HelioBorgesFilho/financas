@@ -17,7 +17,7 @@ class JwtService
         $header = json_encode($header);
         $header = base64_encode($header);
 
-        $expiracao = time() + (30 * 24 * 60 * 60);
+        $expiracao = time() + (30 * 60);
 
         $payload = [
             'userid' => $usuario['id'],
