@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/config/autoload.php';
 use core\Env;
+use config\Session;
 
 $envPath  = __DIR__ . '/.env';
 Env::load($envPath);
@@ -24,4 +25,6 @@ $routes = array_merge(['financas'], $segments);
 
 $content = json_decode(file_get_contents('php://input'), true);
 
-require_once __DIR__ . '/routes/routes.php';
+Session::ativar();
+
+require_once __DIR__ . '/routes.php';

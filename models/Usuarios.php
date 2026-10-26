@@ -186,4 +186,18 @@ class Usuarios {
 
         return $usuario;
     }
+
+    public function usuario($email){
+
+        $sql = 'SELECT id, nome, email, senha, email_pendente, url_foto, cor, idade, assinatura FROM usuarios WHERE email = :email';
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':email', $email);
+
+        $stmt->execute();
+
+        $usuario = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        return $usuario;
+    }
 }

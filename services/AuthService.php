@@ -2,55 +2,99 @@
 
 namespace services;
 
-use PDO;
-use Exception;
 use services\JwtService;
+use models\Usuarios;
+use config\Session;
+use controllers\Controller;
 
-class AuthService
-{
-    private PDO $db;
+class AuthService {
 
-    public function __construct()
-    {
-        $this->db = require __DIR__ . '/../config/database.php';
+    public function logando($data){
+
+        $Controller = new Controller;
+
+        $email = trim($data['email']);
+        $senha = trim($data['senha']);
+
+        if ($data['email'] != null && $data['senha'] != null) {
+
+            $Usuarios = new Usuarios;
+
+            $usuario = $Usuarios->usuario($email);
+
+            if ($email == $usuario['email'] && $senha == $usuario['senha']) {
+
+                $JwtService = new JwtService;
+
+                $gerador = $JwtService->generateToken($usuario);
+
+                session_regenerate_id(true);
+
+                $duracao = 30 * 24 * 60 * 60; // 30 dias
+
+                session_regenerate_id(true);
+
+                $_SESSION['usuario_id'] = $usuario['id'];
+                $_SESSION['expira_em'] = time() + $duracao;
+
+                $expiracao = date('c', $gerador['expiracao']);
+
+                $mensagem = [
+                    "token_acesso" => $gerador['token'],
+                    "token_acesso_expira_em" => $expiracao,
+                    "usuario" => [
+                      "id" => $usuario['id'],
+                      "nome" => $usuario['nome'],
+                      "email" => $usuario['email'],
+                      "email_pendente" => $usuario['email_pendente'],
+                      "foto_url" => $usuario['foto_url'],
+                      "cor" => $usuario['cor'],
+                      "idade" => $usuario['idade'],
+                      "papel" => "membro",
+                      "assinatura" => [ "plano" => "standard", "nome" => "Standard" ],
+                    ]
+                ];
+                $codigo = 200;
+            } else {
+
+                $mensagem = $Controller->modeloRespostaErro('credenciais_invalidas', 'E-mail ou senha incorretos.');
+                $codigo = 401;
+            }
+        } else {
+
+            if ($data['email'] == null && $data['senha'] == null) {
+                
+                $mensagem = $Controller->modeloRespostaErro('validação', 'JSON mal formado!');
+                $codigo = 400;
+            }else{
+
+                $campos = ['email' => $email, 'senha' => $senha];
+
+                $mensagem = $Controller->modeloRespostaErro('validação', 'Preencha os campos obrigatórios destacados.', $campos);
+                $codigo = 422;
+            }
+        }
+
+        $resposta = $Controller->resposta($codigo, $mensagem);
+
+        return $resposta;   
     }
 
-    public function login(string $email, string $password): array
-    {
-        $sql = "
-            SELECT
-                id,
-                name,
-                email,
-                password
-            FROM users
-            WHERE email = :email
-            LIMIT 1
-        ";
+    public static function sessaoAberta(){
 
-        $stmt = $this->db->prepare($sql);
+        $session = Session::verificarSessao();        
 
-        $stmt->execute([
-            ':email' => $email
-        ]);
+        if($session['logado']){
 
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            $Usuarios = new Usuarios;
+            $JwtService = new JwtService;            
 
-        if (!$user) {
-            throw new Exception('E-mail ou senha inválidos');
+            $usuario = $Usuarios->detalhes($session["usuario_id"]);
+            $token = $JwtService->generateToken($usuario);            
+            return ['code' => 200, 'mensagem' => $token];
+        }else{
+
+            return ['code' => 401, 'mensagem' => 'Autenticação expirada.'];
         }
-
-        if (!password_verify($password, $user['password'])) {
-            throw new Exception('E-mail ou senha inválidos');
-        }
-
-        $token = $this->generateToken($user);
-
-        unset($user['password']);
-
-        return [
-            'user' => $user,
-            'token' => $token
-        ];
     }
 }

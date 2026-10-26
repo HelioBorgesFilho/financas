@@ -1,7 +1,6 @@
 <?php
 
 use controllers\Controller;
-
 use middleware\AuthMiddleware;
 
 $AuthMiddleware = new AuthMiddleware;
@@ -134,6 +133,9 @@ switch ($method) {
                 } elseif ($numberOfRoute === 3 && $route[2] === 'sair') {
 
                     $response = $controller->resposta(200, '/auth/sair'); // teste, remover depois
+                } elseif ($numberOfRoute === 3 && $route[2] === 'renovar'){
+
+                    $response = $controller->mainController('renovar', $content);
                 } else {
                     $response = $controller->mainController('error');
                 }
