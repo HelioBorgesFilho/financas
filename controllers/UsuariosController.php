@@ -42,7 +42,7 @@ class UsuariosController
 
             if ($data['email'] == null && $data['senha'] == null) {
 
-                $mensagem = $Resposta->modeloRespostaErro('validação', 'JSON mal formado!');
+                $mensagem = $Resposta->modeloRespostaErro('validação', 'Nenhum dado informado.');
                 $codigo = 400;
             } else {
 

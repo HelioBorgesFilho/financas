@@ -42,9 +42,12 @@ class Resposta {
 
         if($campos){
 
-            foreach($campos as $campo){                
+            foreach($campos as $posicao => $campo){  
+                
+                if($campo == null){
 
-                $camposSelecionados[$campo] = $this->mensagensPadraoErro($campo);
+                    $camposSelecionados[$posicao] = $this->mensagensPadraoErro($posicao);
+                }                
             }
         }
         if(isset($camposSelecionados)){

@@ -4,7 +4,7 @@ namespace controllers;
 
 class Validacao {
 
-    public function camposObrigatorios($requisicao, $dados): array{
+    public function camposObrigatorios(string $requisicao, array $dados): array{
 
         $campos = [
             'cadastro' => ['nome' => 'obrigatorio', 'email' => 'obrigatorio', 'senha' => 'obrigatorio'],
@@ -35,7 +35,7 @@ class Validacao {
 
                 if($dado == null){
 
-                    $arrayRetorno[] = $posicao;
+                    $arrayRetorno[$posicao] = $dado;
                 }
             }
         }
