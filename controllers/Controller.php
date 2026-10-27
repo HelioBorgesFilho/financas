@@ -3,10 +3,6 @@
 namespace controllers;
 
 use middleware\AuthMiddleware;
-use utils\GeradorCodigoEmail;
-use models\Usuarios;
-use controllers\Validacao;
-use utils\Codigos;
 use controllers\Resposta;
 use controllers\UsuariosController;
 use services\AuthService;
@@ -52,57 +48,8 @@ class Controller
 
             case 'cadastro':
 
-                $Usuarios = new Usuarios;
-
-                $nome = $data['nome'] ?? null;
-                $email = $data['email'] ?? null;
-                $senha = $data['senha'] ?? null;
-                $idade = $data['idade'] ?? null;
-                $codigoConvite = isset($data["convite_codigo"]) ? $data['codigoConvite'] : null;
-
-                if ($nome != null && $email != null && $senha != null && is_int($idade)) {
-
-                    $codigoEmail = GeradorCodigoEmail::gerar();
-
-                    $cadastrar = $Usuarios->cadastrar($nome, $email, $senha, $idade, $codigoEmail, $codigoConvite);
-
-                    if ($cadastrar['status']) {
-
-                        $usuario['dados'] = $Usuarios->detalhes($cadastrar['usuario']);
-
-                        $mensagem = array_merge(['status' => $cadastrar['mensagem']], $usuario);
-
-                        $resposta = $Resposta->resposta(202, $mensagem);
-                    } else {
-
-                        $erro = explode(' ', $cadastrar["mensagem"][2]);
-
-                        $Utils = new Codigos;
-                        $retorno = $Utils->codigo($cadastrar);
-
-                        $codigo = isset($erro[5]) == 'email' ? 'email_em_uso' : 'erro geral';
-                        $mensagem = $codigo == 'email_em_uso' ? 'Já existe uma conta com esse e-mail.' : $Utils->codigo($cadastrar);
-
-                        $modeloRespostaErro = $Resposta->modeloRespostaErro($codigo, $mensagem);
-                        $resposta = $Resposta->resposta($retorno["http"], $modeloRespostaErro);
-                    }
-                } else {
-
-                    if ($nome == null && $email == null && $senha == null && !is_int($idade)) {
-
-                        $resposta = $Resposta->resposta(400, ['erro' => 'JSON mal formado!']);
-                    } else {
-
-                        $Validacao = new Validacao;
-
-                        $dados = ['nome' => $nome, 'email' => $email, 'senha' => $senha, 'idade' => $idade];
-                        $arrayCampos = $Validacao->camposObrigatorios('cadastro', $dados);
-
-                        $modeloRespostaErro = $Resposta->modeloRespostaErro('validacao', 'Preencha os campos obrigatórios destacados.', $arrayCampos);
-
-                        $resposta = $Resposta->resposta(422, $modeloRespostaErro);
-                    }
-                }
+                $UsuariosController = new UsuariosController;
+                $resposta = $UsuariosController->cadastrar($data);
 
                 break;
 

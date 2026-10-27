@@ -173,7 +173,7 @@ class Usuarios {
         }
     }
 
-    public function detalhes($id){
+    public function detalhes($id) {
 
         $sql = 'SELECT id, nome, email, email_pendente, url_foto, cor, idade, assinatura FROM usuarios WHERE id = :id';
 
@@ -182,7 +182,7 @@ class Usuarios {
 
         $stmt->execute();
 
-        $usuario = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $usuario = $stmt->fetch(\PDO::FETCH_ASSOC)  ;
 
         return $usuario;
     }
