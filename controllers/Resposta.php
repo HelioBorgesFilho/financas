@@ -6,7 +6,7 @@ class Resposta {
 
     public function resposta($code, $mensagem): array
     {
-        return ['code' => $code, 'status' => ['mensagem' => $mensagem]];
+        return ['code' => $code, 'mensagem' => $mensagem];
     }
 
     public function mensagensPadraoErro($nomeMensagem): string{

@@ -48,7 +48,7 @@ class Codigos
 
         foreach($errosMysql as $posicao => $erro){
 
-            if($cadastrar["mensagem"][1] == $posicao){
+            if($cadastrar[1] == $posicao){
 
                 return $erro;
             }

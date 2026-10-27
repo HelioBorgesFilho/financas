@@ -23,7 +23,7 @@ if (in_array($segments[0], ['financas', 'index.php'], true)) {
 
 $routes = array_merge(['financas'], $segments);
 
-$content = json_decode(file_get_contents('php://input'), true);
+$content = json_decode(file_get_contents('php://input'), true) ?? [];
 
 Session::ativar();
 

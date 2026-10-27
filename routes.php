@@ -428,7 +428,7 @@ switch ($method) {
 }
 
 $code = $response['code'];
-$info = $response["status"]["mensagem"] ?? $response['data'];
+$info = $response["mensagem"] ?? $response['data'];
 
 http_response_code($code);
 echo json_encode($info);
