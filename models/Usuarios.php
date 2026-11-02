@@ -189,7 +189,7 @@ class Usuarios {
 
     public function usuario($email){
 
-        $sql = 'SELECT id, nome, email, senha, email_pendente, url_foto, cor, idade, assinatura FROM usuarios WHERE email = :email';
+        $sql = 'SELECT * FROM usuarios WHERE email = :email';
 
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':email', $email);
@@ -199,5 +199,23 @@ class Usuarios {
         $usuario = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         return $usuario;
+    }
+
+    public function detalhesFamilia(int $idFamilia): array|false
+    {
+        $sql = 'SELECT
+                COUNT(CASE WHEN nivel_acesso = :administrador THEN 1 END) AS administradores,
+                COUNT(CASE WHEN nivel_acesso = :membro THEN 1 END) AS membros
+            FROM usuarios
+            WHERE id_familia = :id_familia';
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id_familia', $idFamilia, \PDO::PARAM_INT);
+        $stmt->bindValue(':administrador', 'administrador');
+        $stmt->bindValue(':membro', 'membro');
+
+        $stmt->execute();
+
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 }

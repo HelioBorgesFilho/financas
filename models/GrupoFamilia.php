@@ -4,18 +4,20 @@ namespace models;
 
 use core\Database;
 
-class GrupoFamilia {
+class GrupoFamilia
+{
 
     private $db;
 
-    private function __construct()
+         function __construct()
     {
         $this->db = Database::getConnection();
     }
 
-    public function criar(array $dados) : array {
+    public function criar(array $dados): array
+    {
 
-        try{
+        try {
 
             $sql = 'INSERT INTO grupo_familia (nome, limite_mensal_centavos, usuario_criador, data_cadastro) VALUES (:nome, :limite_mensal_centavos, :usuario_criador, :data_cadastro)';
 
@@ -30,8 +32,7 @@ class GrupoFamilia {
             return [
                 'status' => true,
             ];
-
-        }catch(\PDOException $e){
+        } catch (\PDOException $e) {
 
             return [
                 'status' => false,
@@ -40,9 +41,10 @@ class GrupoFamilia {
         }
     }
 
-    public function editar(array $dados) : array {
+    public function editar(array $dados): array
+    {
 
-        try{
+        try {
 
             $sql = 'UPDATE grupo_familia SET nome = :nome, limite_mensal_centavos = :limite_mensal_centavos, usuario_editor = :usuario_editor, data_modificacao = :data_modificacao WHERE id = :id';
 
@@ -62,8 +64,7 @@ class GrupoFamilia {
                     ? 'Dados alterados com sucesso!'
                     : 'Nenhum dado foi alterado.'
             ];
-
-        }catch(\PDOException $e){
+        } catch (\PDOException $e) {
 
             return [
                 'status' => false,
@@ -72,9 +73,10 @@ class GrupoFamilia {
         }
     }
 
-    public function remover(int $id) : array {
+    public function remover(int $id): array
+    {
 
-        try{
+        try {
 
             $sql = 'UPDATE grupo_familia SET deletado = :deletado WHERE id = :id';
 
@@ -92,8 +94,7 @@ class GrupoFamilia {
                     ? 'Deletado com sucesso!'
                     : 'Nenhum dado foi deletado.'
             ];
-
-        }catch(\PDOException $e){
+        } catch (\PDOException $e) {
 
             return [
                 'status' => false,
@@ -102,13 +103,24 @@ class GrupoFamilia {
         }
     }
 
-    public function detalhes(int $id) {
+    public function detalhes(int $id): array|false
+    {
+        try {
+            $sql = 'SELECT id, nome, limite_mensal_centavos, deletada, fuso_horario
+            FROM grupo_familia
+            WHERE id = :id';
 
-        $sql = 'SELECT id, nome, limite_mensal_centavos, deletado FROM grupo_familia WHERE id = :id';
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
+            $stmt->execute();
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->bindValue(':id', $id);
+            return $stmt->fetch(\PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
 
-        return $stmt->fetch(\PDO::FETCH_ASSOC);
+            return [
+                'status' => false,
+                'mensagem' => $e->errorInfo
+            ];
+        }
     }
 }
