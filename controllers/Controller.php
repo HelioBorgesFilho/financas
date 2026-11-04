@@ -6,6 +6,8 @@ use middleware\AuthMiddleware;
 use controllers\Resposta;
 use controllers\UsuariosController;
 use services\AuthService;
+use controllers\FormasPagamentoController;
+use config\Session;
 
 class Controller
 {
@@ -58,6 +60,23 @@ class Controller
                 $sessaoAberta = AuthService::sessaoAberta();
 
                 $resposta = $Resposta->resposta($sessaoAberta['code'], $sessaoAberta['mensagem']);
+
+                break;
+
+            case 'formasPagamento':
+
+                $acesso = $AuthMiddleware->validarAcesso();
+
+                if ($acesso["status"]) {
+
+                    $UsuariosController = new FormasPagamentoController;
+
+                    $resposta = $UsuariosController->cadastrarPagamento($data, $acesso['mensagem']);
+
+                } else {
+
+                    return $Resposta->modeloRespostaErro(401, $acesso['mensagem']);
+                } 
 
                 break;
 

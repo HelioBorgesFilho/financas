@@ -16,6 +16,7 @@ class Resposta {
             'email' => 'Informe o e-mail.',
             'senha' => 'Use pelo menos 8 caracteres.', 
             'idade' => 'Informe sua idade.',
+            'tipo' => 'Escolha o tipo da forma de pagamento.',
         ];
 
         $mensagem = '';
@@ -46,14 +47,11 @@ class Resposta {
                 
                 if($campo == null){
 
-                    $camposSelecionados[$posicao] = $this->mensagensPadraoErro($posicao);
+                    $respostaErro["erro"]['campos'][$posicao] = $this->mensagensPadraoErro($posicao);
                 }                
             }
         }
-        if(isset($camposSelecionados)){
 
-            $respostaErro['erro']['campos'] = $camposSelecionados;
-        }
         return $respostaErro;       
     }
 }

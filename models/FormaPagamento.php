@@ -20,7 +20,7 @@ class FormaPagamento
     {
 
         try {
-            $sql = 'INSERT INTO forma_pagamento (nome, tipo, digito_cartao, apelido_cartao, usuario_criador, data_cadastro, usuario_editor, data_modificacao, deletada) VALUES (:nome, :tipo, :digito_cartao, :apelido_cartao, :usuario_criador, :data_cadastro, :usuario_editor, :data_modificacao, :deletada)';
+            $sql = 'INSERT INTO forma_pagamento (nome, tipo, digito_cartao, apelido_cartao, usuario_criador, data_cadastro ) VALUES (:nome, :tipo, :digito_cartao, :apelido_cartao, :usuario_criador, :data_cadastro )';
 
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
@@ -29,10 +29,7 @@ class FormaPagamento
                 ':digito_cartao' => $dados['digito_cartao'],
                 ':apelido_cartao' => $dados['apelido_cartao'],
                 ':usuario_criador' => $dados['usuario_criador'],
-                ':data_cadastro' => $dados['data_cadastro'],
-                ':usuario_editor' => $dados['usuario_editor'],
-                ':data_modificacao' => $dados['data_modificacao'],
-                ':deletada' => (int) ($dados['deletada'])
+                ':data_cadastro' => time(),
             ]);
 
             return [
@@ -114,8 +111,8 @@ class FormaPagamento
             $sql = 'SELECT * FROM forma_pagamento WHERE id = :id';
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
-            $status = $stmt->execute();
-            $dados = $stmt->fetch(\PDO::FETCH_ASSOC);
+            $stmt->execute();
+            $dados = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
             return [
                 'status' => true,

@@ -9,6 +9,7 @@ class Validacao {
         $campos = [
             'cadastro' => ['nome' => 'obrigatorio', 'email' => 'obrigatorio', 'senha' => 'obrigatorio'],
             'login' => ['nome' => 'obrigatorio', 'email' => 'obrigatorio', 'senha' => 'obrigatorio'],
+            'formaPagamento' => ['nome' => 'obrigatorio', 'tipo' => 'obrigatorio'],
         ];
 
         $campoSelecionado = [];
