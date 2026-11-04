@@ -16,7 +16,7 @@ class FormasPagamentoService {
         $data['apelido_cartao'] = isset($data['apelido_cartao']) ? trim($data['apelido_cartao']) : null;
         $data['usuario_criador'] = $usuario['id'];
 
-        $formas = $FormaPagamento->metodosPagamentos($usuario['id']);
+        $formas = $FormaPagamento->metodosPagamentos($usuario['id']);   
 
         foreach($formas as $forma){
 

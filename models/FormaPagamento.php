@@ -125,4 +125,25 @@ class FormaPagamento
             ];
         }
     }
+
+    public function metodosPagamentos(int $id) : array
+    {
+        try {
+            $sql = 'SELECT * FROM forma_pagamento WHERE usuario_criador = :id';
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
+            $stmt->execute();
+            $dados = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            return [
+                'status' => true,
+                'mensagem' => $dados ?: []
+            ];
+        } catch (PDOException $e) {
+            return [
+                'status' => false,
+                'mensagem' => $e->errorInfo
+            ];
+        }
+    }
 }
