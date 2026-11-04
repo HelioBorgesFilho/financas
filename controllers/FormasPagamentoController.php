@@ -30,8 +30,10 @@ class FormasPagamentoController {
         $tipoValido = is_string($tipo) && trim($tipo) !== '';
 
         $digitoValido = $digitoCartao === null || (
-            is_string($digitoCartao)
-            && preg_match('/^[0-9]{4}$/', trim($digitoCartao)) === 1
+            is_string($digitoCartao) && (
+                trim($digitoCartao) === '' ||
+                preg_match('/^[0-9]{4}$/', trim($digitoCartao)) === 1
+            )
         );
 
         if ($nomeValido && $tipoValido && $digitoValido) {
