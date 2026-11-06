@@ -40,7 +40,7 @@ switch ($method) {
 
                 if ($numberOfRoute === 2) {
 
-                    $response = $controller->resposta(200, '/formas-pagamento'); // teste, remover depois
+                    $response = $controller->mainController('formasPagamento', $content);
                 } else {
                     $response = $controller->mainController('error');
                 }
@@ -428,7 +428,7 @@ switch ($method) {
 }
 
 $code = $response['code'];
-$info = $response["mensagem"] ?? $response['data'];
+$info = $response["mensagem"] ?? $response['erro'];
 
 http_response_code($code);
 echo json_encode($info);
