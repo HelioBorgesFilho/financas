@@ -6,7 +6,7 @@ use middleware\AuthMiddleware;
 $AuthMiddleware = new AuthMiddleware;
 $controller = new Controller();
 
-$route = $AuthMiddleware->route($routes);
+$route = $routes;
 
 $numberOfRoute = count($route);
 
@@ -427,7 +427,7 @@ switch ($method) {
         $response = $controller->mainController('error');
 }
 
-$code = $response['code'];
+$code = $response['codigo'] ?? $response['erro']['codigo'];
 $info = $response["mensagem"] ?? $response['erro'];
 
 http_response_code($code);
