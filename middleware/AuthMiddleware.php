@@ -38,7 +38,7 @@ class AuthMiddleware
         if (!$session['status']) {
             return [
                 'status' => false,
-                'code' => 401,
+                'codigo' => 401,
                 'mensagem' => $session
             ];
         }
@@ -50,7 +50,7 @@ class AuthMiddleware
         if ($token === null) {
             return [
                 'status' => false,
-                'code' => 401,
+                'codigo' => 401,
                 'mensagem' => 'Token não informado.'
             ];
         }
@@ -62,21 +62,21 @@ class AuthMiddleware
             if ($response['mensagem'] === 'Expirado') {
                 return [
                     'status' => false,
-                    'code' => 401,
+                    'codigo' => 401,
                     'mensagem' => $response['mensagem']
                 ];
             }
 
             return [
                 'status' => false,
-                'code' => 401,
+                'codigo' => 401,
                 'mensagem' => $response['mensagem']
             ];
         }
 
         return [
             'status' => true,
-            'code' => 200,
+            'codigo' => 200,
             'mensagem' => $response['mensagem']
         ];
     }
