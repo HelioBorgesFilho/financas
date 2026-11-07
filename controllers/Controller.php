@@ -67,16 +67,22 @@ class Controller
 
                 $acesso = $AuthMiddleware->validarAcesso();
 
-                if ($acesso["status"]) {
+                if ($acesso['status']) {
 
                     $UsuariosController = new FormasPagamentoController;
 
-                    $resposta = $UsuariosController->cadastrarPagamento($data, $acesso['mensagem']);
+                    $resposta = $UsuariosController->cadastrarPagamento(
+                        $data,
+                        $acesso['mensagem']
+                    );
 
                 } else {
 
-                    return $Resposta->modeloRespostaErro(401, $acesso['mensagem']);
-                } 
+                    return $Resposta->modeloRespostaErro(
+                        $acesso['codigo'],
+                        $acesso['mensagem'],
+                    );
+                }
 
                 break;
 

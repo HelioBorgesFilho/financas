@@ -3,7 +3,6 @@
 namespace controllers;
 
 use controllers\Resposta;
-use services\JwtService;
 use models\Usuarios;
 use controllers\Validacao;
 use services\FormasPagamentoService;
@@ -47,16 +46,7 @@ class FormasPagamentoController {
 
             if($adicionar['status']){
 
-                if($acesso == 'Seu token expirou.'){
-
-                    $JwtService = new JwtService;        
-                    
-                    $novoToken = $JwtService->generateToken($usuario);
-
-                    $adicionar['mensagem'] = array_merge($adicionar['mensagem'], ['token' => $novoToken]);
-                }
-
-                return $Resposta->resposta($adicionar["codigo"], $adicionar["mensagem"]);
+                return $Resposta->resposta($adicionar["codigo"], $adicionar["mensagem"]); 
             }
 
             return $Resposta->modeloRespostaErro($adicionar["codigo"], $adicionar["mensagem"]);
