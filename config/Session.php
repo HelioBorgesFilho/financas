@@ -32,7 +32,7 @@ class Session {
         }
 
         return [
-            'logado' => true,
+            'status' => true,
             'usuario_id' => $_SESSION['usuario_id'],
         ];
     }
