@@ -46,7 +46,7 @@ class FormasPagamentoController {
 
             if($adicionar['status']){
 
-                return $Resposta->resposta($adicionar["codigo"], $adicionar["mensagem"]);
+                return $Resposta->resposta($adicionar["codigo"], $adicionar["mensagem"]); 
             }
 
             return $Resposta->modeloRespostaErro($adicionar["codigo"], $adicionar["mensagem"]);
