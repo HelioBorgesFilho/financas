@@ -9,7 +9,7 @@ use config\Session;
 class AuthService
 {
 
-    public function logando(array $usuario) : array
+    public function logando(array $usuario): array
     {
 
         $JwtService = new JwtService;
@@ -39,7 +39,7 @@ class AuthService
                 "assinatura" => ["plano" => "standard", "nome" => "Standard"],
             ]
         ];
-        
+
         return ['mensagem' => $mensagem];
     }
 
@@ -48,7 +48,7 @@ class AuthService
 
         $session = Session::verificarSessao();
 
-        if ($session['logado']) {
+        if ($session['status']) {
 
             $Usuarios = new Usuarios;
             $JwtService = new JwtService;
@@ -58,7 +58,7 @@ class AuthService
             return ['code' => 200, 'mensagem' => $token];
         } else {
 
-            return ['code' => 401, 'mensagem' => 'Autenticação expirada.'];
+            return ['code' => 401, 'mensagem' => $session['mensagem']];
         }
     }
 }

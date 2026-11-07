@@ -28,11 +28,11 @@ class Session {
             !isset($_SESSION['usuario_id'], $_SESSION['expira_em'])
             || time() >= $_SESSION['expira_em']
         ) {
-            return ['logado' => false];
+            return ['status' => false, 'mensagem' => 'Sua sessão expirou. Faça login novamente.'];
         }
 
         return [
-            'logado' => true,
+            'status' => true,
             'usuario_id' => $_SESSION['usuario_id'],
         ];
     }
