@@ -3,6 +3,7 @@
 namespace middleware;
 
 use services\JwtService;
+use config\Session;
 
 class AuthMiddleware
 {
@@ -13,7 +14,7 @@ class AuthMiddleware
         $this->jwtService = new JwtService();
     }
 
-    private function extractToken(array $headers): ?string
+    private function extrairToken(array $headers): ?string
     {
         $authorization = $headers['Authorization'] ?? '';
         $parts = explode(' ', trim($authorization), 2);
@@ -30,34 +31,53 @@ class AuthMiddleware
         return $token !== '' ? $token : null;
     }
 
-    public function handle()
+    public function validarAcesso(): array
     {
-        $headers = apache_request_headers();
-        $token = $this->extractToken($headers);
+        $session = Session::verificarSessao();
+
+        if (!$session['status']) {
+            return [
+                'status' => false,
+                'code' => 401,
+                'mensagem' => $session
+            ];
+        }
+
+        $headers = function_exists('getallheaders') ? getallheaders() : [];
+
+        $token = $this->extrairToken($headers);
 
         if ($token === null) {
-            return ['status' => false, 'message' => 'Token não informado ou formato inválido'];
+            return [
+                'status' => false,
+                'code' => 401,
+                'mensagem' => 'Token não informado.'
+            ];
         }
 
-        $response = $this->jwtService->validateJwt($token);
+        $response = $this->jwtService->validateJwt($token, $session['usuario_id']);
 
-        if(!$response){
+        if (!$response['status']) {
 
-            return ['status' => $response, 'message' => 'Token inválido'];
+            if ($response['mensagem'] === 'Expirado') {
+                return [
+                    'status' => false,
+                    'code' => 401,
+                    'mensagem' => $response['mensagem']
+                ];
+            }
+
+            return [
+                'status' => false,
+                'code' => 401,
+                'mensagem' => $response['mensagem']
+            ];
         }
 
-        return ['status' => $response, 'message' => 'sucess'];
+        return [
+            'status' => true,
+            'code' => 200,
+            'mensagem' => $response['mensagem']
+        ];
     }
-
-    public function route($routes) {
-
-        $chosenRoute = [];
-
-        foreach($routes as $key => $route) {
-            
-            $chosenRoute[$key] = $route;
-        } 
-        return $chosenRoute;
-    }
-
 }
