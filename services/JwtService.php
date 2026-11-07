@@ -2,9 +2,16 @@
 
 namespace services;
 
+use core\Config;
+
 class JwtService
 {
-    private $secret = 'XAPOIDJJ8sd83auhuigs';
+    private string $secret;
+
+    public function __construct()
+    {
+        $this->secret = Config::get('TOKEN');
+    }
 
     public function generateToken( array $usuario) : array
     {
@@ -40,7 +47,7 @@ class JwtService
 
         $parts = explode('.', $token);
         if (count($parts) !== 3) {
-            return ['status' => true, 'message' => 'Token invalido!'];
+            return ['status' => false, 'mensagem' => 'Token invalido!'];
         }
 
         list($headerEncoded, $payloadEncoded, $signatureProvided) = $parts;
@@ -48,27 +55,27 @@ class JwtService
         $expectedSignature = hash_hmac('sha256', "$headerEncoded.$payloadEncoded", $this->secret, true);
         $expectedSignatureEncoded = base64_encode($expectedSignature);
 
-        if ($expectedSignatureEncoded !== $signatureProvided) {
-            return ['status' => false, 'message' => 'Token incorreto!'];
+        if (!hash_equals($expectedSignatureEncoded, $signatureProvided)) {
+            return ['status' => false, 'mensagem' => 'Token incorreto!'];
         }
 
         $payloadJson = base64_decode($payloadEncoded);
         $payload = json_decode($payloadJson, true);
 
         if (!$payload) {
-            return ['status' => false, 'message' => 'Dados invalidos!'];
+            return ['status' => false, 'mensagem' => 'Dados invalidos!'];
         }
 
         if($userId != null){
             if($payload['userid'] != $userId){
-                return ['status' => false, 'message' => 'Dados invalidos!'];
+                return ['status' => false, 'mensagem' => 'Dados invalidos!'];
             }
         }
 
         if (isset($payload['exp']) && time() > $payload['exp']) {
-            return ['status' => false, 'message' => 'Expirado'];
+            return ['status' => false, 'mensagem' => 'Seu token expirou.'];
         }
 
-        return ['status' => true, 'message' => 'success'];
+        return ['status' => true, 'mensagem' => 'sucesso'];
     }
 }
