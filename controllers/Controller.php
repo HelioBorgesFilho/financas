@@ -7,6 +7,7 @@ use controllers\Resposta;
 use controllers\UsuariosController;
 use services\AuthService;
 use controllers\FormasPagamentoController;
+use services\UsuarioFormaPagamentoService;
 
 class Controller
 {
@@ -84,6 +85,26 @@ class Controller
                 }
 
                 break;
+
+                case 'usuarioFormaPagamento':
+
+                    $acesso = $AuthMiddleware->validarAcesso();
+    
+                    if ($acesso['status']) {
+    
+                        $UsuarioFormaPagamentoService = new UsuarioFormaPagamentoService;
+    
+                        $resposta = $UsuarioFormaPagamentoService->formaPagamentoCadastradas();
+    
+                    } else {
+    
+                        return $Resposta->modeloRespostaErro(
+                            $acesso['codigo'],
+                            $acesso['mensagem'],
+                        );
+                    }
+    
+                    break;
 
             default:
 

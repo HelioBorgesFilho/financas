@@ -177,9 +177,9 @@ switch ($method) {
 
             case 'formas-pagamento':
 
-                if ($numberOfRoute === 2) {
+                if ($numberOfRoute === 3 && $route[2] == 'usuario') {
 
-                    $response = $controller->resposta(200, '/formas-pagamento'); // teste, remover depois
+                    $response = $controller->mainController('usuarioFormaPagamento', $route[3]); // teste, remover depois
 
                 } else {
                     $response = $controller->mainController('error');
