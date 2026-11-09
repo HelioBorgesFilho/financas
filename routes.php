@@ -14,7 +14,7 @@ $routeExists = $controller->checkingRoutes($route, $numberOfRoute);
 
 if (!$routeExists) {
     $response = $controller->mainController('error');
-    http_response_code($response['code']);
+    http_response_code($response['codigo']);
     echo json_encode($response['status']);
     exit;
 }

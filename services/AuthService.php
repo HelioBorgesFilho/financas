@@ -55,10 +55,10 @@ class AuthService
 
             $usuario = $Usuarios->detalhes($session["usuario_id"]);
             $token = $JwtService->generateToken($usuario);
-            return ['code' => 200, 'mensagem' => $token];
+            return ['codigo' => 200, 'mensagem' => $token];
         } else {
 
-            return ['code' => 401, 'mensagem' => $session['mensagem']];
+            return ['codigo' => 401, 'mensagem' => $session['mensagem']];
         }
     }
 }

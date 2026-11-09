@@ -4,9 +4,9 @@ namespace controllers;
 
 class Resposta {
 
-    public function resposta($code, $mensagem): array
+    public function resposta($codigo, $mensagem): array
     {
-        return ['code' => $code, 'mensagem' => $mensagem];
+        return ['codigo' => $codigo, 'mensagem' => $mensagem];
     }
 
     public function mensagensPadraoErro($nomeMensagem): string{

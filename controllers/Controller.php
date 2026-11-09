@@ -7,7 +7,6 @@ use controllers\Resposta;
 use controllers\UsuariosController;
 use services\AuthService;
 use controllers\FormasPagamentoController;
-use config\Session;
 
 class Controller
 {
@@ -59,7 +58,7 @@ class Controller
 
                 $sessaoAberta = AuthService::sessaoAberta();
 
-                $resposta = $Resposta->resposta($sessaoAberta['code'], $sessaoAberta['mensagem']);
+                $resposta = $Resposta->resposta($sessaoAberta['codigo'], $sessaoAberta['mensagem']);
 
                 break;
 
