@@ -17,6 +17,7 @@ class Resposta {
             'senha' => 'Use pelo menos 8 caracteres.', 
             'idade' => 'Informe sua idade.',
             'tipo' => 'Escolha o tipo da forma de pagamento.',
+            'digito_cartao' => 'Deve conter exatamente 4 dígitos numéricos.'
         ];
 
         $mensagem = '';
@@ -37,9 +38,9 @@ class Resposta {
         return $mensagem;
     }
 
-    public function modeloRespostaErro($codigo, $mensagem, $campos = null): array {
+    public function modeloRespostaErro(int $codigo, $mensagem, $motivo = null, $campos = null): array {
 
-        $respostaErro['erro'] = ['codigo' => $codigo, 'mensagem' => $mensagem];
+        $respostaErro = ['erro' => ['mensagem' => $mensagem]];
 
         if($campos){
 
@@ -47,11 +48,13 @@ class Resposta {
                 
                 if($campo == null){
 
+                    $respostaErro["erro"]["codigo"] = $motivo;
+
                     $respostaErro["erro"]['campos'][$posicao] = $this->mensagensPadraoErro($posicao);
                 }                
             }
         }
 
-        return $respostaErro;       
+        return ['codigo' => $codigo, 'mensagem' => $respostaErro];       
     }
 }

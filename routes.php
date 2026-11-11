@@ -177,9 +177,9 @@ switch ($method) {
 
             case 'formas-pagamento':
 
-                if ($numberOfRoute === 2) {
+                if ($numberOfRoute === 3 && $route[2] == 'usuario') {
 
-                    $response = $controller->resposta(200, '/formas-pagamento'); // teste, remover depois
+                    $response = $controller->mainController('usuarioFormaPagamento', $route[3]); // teste, remover depois
 
                 } else {
                     $response = $controller->mainController('error');
@@ -322,9 +322,9 @@ switch ($method) {
 
             case 'formas-pagamento':
 
-                if ($numberOfRoute === 2) {
+                if ($numberOfRoute === 3 && ctype_digit($route[2]) && (int) $route[2] > 0) {
 
-                    $response = $controller->resposta(200, '/formas-pagamento'); // teste, remover depois
+                    $response = $controller->mainController('excluirFormaPagamento', [$route[2]]);
 
                 } else {
                     $response = $controller->mainController('error');
@@ -415,6 +415,19 @@ switch ($method) {
 
                 break;
 
+            case 'formas-pagamento':
+
+                if ($numberOfRoute === 3 && ctype_digit($route[2]) && (int) $route[2] > 0) {
+
+                    $idForma = $route[2];
+
+                    $response = $controller->mainController('editarFormaPagamento', $content, $idForma);
+                } else {
+                    $response = $controller->mainController('error');
+                }
+
+                break;
+
             default:
 
                 $response = $controller->mainController('error');
@@ -427,8 +440,8 @@ switch ($method) {
         $response = $controller->mainController('error');
 }
 
-$code = $response['codigo'] ?? $response['erro']['codigo'];
-$info = $response["mensagem"] ?? $response['erro'];
+$code = $response['codigo'];
+$info = $response["mensagem"];
 
 http_response_code($code);
 echo json_encode($info);

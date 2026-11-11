@@ -46,38 +46,48 @@ class FormaPagamento
     public function atualizar($id, $dados)
     {
         try {
-            $sql = "UPDATE forma_pagamento SET nome = :nome,  digito_cartao = :digito_cartao, apelido_cartao = :apelido_cartao, usuario_editor = :usuario_editor, data_modificacao = :data_modificacao WHERE id = :id";
+            $sql = "UPDATE forma_pagamento SET nome = :nome, tipo = :tipo, digito_cartao = :digito_cartao, apelido_cartao = :apelido_cartao, usuario_editor = :usuario_editor, data_modificacao = :data_modificacao WHERE id = :id";
 
             $stmt = $this->db->prepare($sql);
             $stmt->execute([
                 ':id' => $id,
                 ':nome' => $dados['nome'],
+                ':tipo' => $dados['tipo'],
                 ':digito_cartao' => $dados['digito_cartao'],
                 ':apelido_cartao' => $dados['apelido_cartao'],
                 ':usuario_editor' => $dados['usuario_editor'],
-                ':data_modificacao' => $dados['data_modificacao']
+                ':data_modificacao' => time()
             ]);
 
+            $alterado = $stmt->rowCount() > 0;
+
             return [
-                'status' => true
+                'status' => $alterado,
+                'mensagem' => $alterado
+                    ? 'Dados alterados com sucesso!'
+                    : 'Nenhum dado foi alterado.',
+                'codigo' => 200
             ];
         } catch (PDOException $e) {
             return [
                 'status' => false,
-                'mensagem' => $e->errorInfo
+                'mensagem' => $e->errorInfo,
+                'codigo' => 500
             ];
         }
     }
     public function remover($id)
     {
         try {
-            $sql = 'UPDATE forma_pagamento SET deletada = 1 WHERE id = :id';
+            $sql = 'UPDATE forma_pagamento SET deletada = :deletada WHERE id = :id';
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
-            $status = $stmt->execute();
+            $stmt->bindValue(':deletada', 1, \PDO::PARAM_INT);
+            $stmt->execute();
 
             return [
-                'status' => true
+                'status' => true,
+                'mensagem' => 'Forma deletada'
             ];
         } catch (PDOException $e) {
             return [
@@ -112,11 +122,11 @@ class FormaPagamento
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
             $stmt->execute();
-            $dados = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $dados = $stmt->fetch(\PDO::FETCH_ASSOC);
 
             return [
                 'status' => true,
-                'mensagem' => $dados ?: []
+                'dados' => $dados ?: []
             ];
         } catch (PDOException $e) {
             return [
@@ -128,22 +138,14 @@ class FormaPagamento
 
     public function metodosPagamentos(int $id) : array
     {
-        try {
-            $sql = 'SELECT * FROM forma_pagamento WHERE usuario_criador = :id';
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
-            $stmt->execute();
-            $dados = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-            return [
-                'status' => true,
-                'mensagem' => $dados ?: []
-            ];
-        } catch (PDOException $e) {
-            return [
-                'status' => false,
-                'mensagem' => $e->errorInfo
-            ];
-        }
+        $sql = 'SELECT * FROM forma_pagamento
+        WHERE usuario_criador = :id AND deletada = 0';
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
+        $stmt->execute();
+        $dados = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        return $dados;
     }
 }

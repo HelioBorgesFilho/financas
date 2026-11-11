@@ -7,6 +7,7 @@ use controllers\Resposta;
 use controllers\UsuariosController;
 use services\AuthService;
 use controllers\FormasPagamentoController;
+use services\UsuarioFormaPagamentoService;
 
 class Controller
 {
@@ -19,7 +20,7 @@ class Controller
         return true;
     }
 
-    public function mainController($option, $data = [])
+    public function mainController($option, $data = [], $id = null)
     {
         $AuthMiddleware = new AuthMiddleware;
         $Resposta = new Resposta;
@@ -71,8 +72,7 @@ class Controller
                     $UsuariosController = new FormasPagamentoController;
 
                     $resposta = $UsuariosController->cadastrarPagamento(
-                        $data,
-                        $acesso['mensagem']
+                        $data
                     );
 
                 } else {
@@ -85,9 +85,66 @@ class Controller
 
                 break;
 
+            case 'usuarioFormaPagamento':
+
+                $acesso = $AuthMiddleware->validarAcesso();
+
+                if ($acesso['status']) {
+
+                    $FormasPagamentoController = new FormasPagamentoController;
+
+                    $resposta = $FormasPagamentoController->listarPagamentos();
+                } else {
+
+                    return $Resposta->modeloRespostaErro(
+                        $acesso['codigo'],
+                        $acesso['mensagem'],
+                    );
+                }
+
+                break;
+
+            case 'excluirFormaPagamento':
+
+                $acesso = $AuthMiddleware->validarAcesso();
+
+                if ($acesso['status']) {
+
+                    $FormasPagamentoController = new FormasPagamentoController;
+
+                    $resposta = $FormasPagamentoController->excluirPagamento($data);
+                } else {
+
+                    return $Resposta->modeloRespostaErro(
+                        $acesso['codigo'],
+                        $acesso['mensagem'],
+                    );
+                }
+
+                break;
+
+            case 'editarFormaPagamento':
+
+                $acesso = $AuthMiddleware->validarAcesso();
+
+                if ($acesso['status']) {
+
+                    $FormasPagamentoController = new FormasPagamentoController;
+
+                    $resposta = $FormasPagamentoController->editarPagamentos($id, $data);
+                } else {
+
+                    return $Resposta->modeloRespostaErro(
+                        $acesso['codigo'],
+                        $acesso['mensagem'],
+                    );
+                }
+
+                break;
+
             default:
 
-                $resposta = $Resposta->resposta(404, 'A requisição não foi encontrada!');
+                $resposta = $Resposta->modeloRespostaErro(404, 'A requisição não foi encontrada!');
         }
 
         return $resposta;
