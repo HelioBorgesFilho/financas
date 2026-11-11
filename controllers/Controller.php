@@ -146,7 +146,6 @@ class Controller
 
                 $resposta = $Resposta->modeloRespostaErro(404, 'A requisição não foi encontrada!');
         }
-
         return $resposta;
     }
 }

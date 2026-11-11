@@ -17,10 +17,14 @@ class UsuariosController
 
         $Resposta = new Resposta;
 
-        $email = trim($data['email']);
-        $senha = trim($data['senha']);
+        if (empty($data)) {
+            return $Resposta->modeloRespostaErro(400,  'JSON mal formado.', 'validação');
+        }
 
-        if ($data['email'] != null && $data['senha'] != null) {
+        $email = isset($data['email']) && trim($data['email']) != '' ? trim($data['email']) : null;
+        $senha = isset($data['senha']) && trim($data['senha']) != '' ? trim($data['senha']) : null;
+
+        if ($email != null && $senha != null) {
 
             $Usuarios = new Usuarios;
 
@@ -31,31 +35,18 @@ class UsuariosController
                 $AuthService = new AuthService;
 
                 $logando = $AuthService->logando($usuario);
-                $codigo = 200;
-                $mensagem = $logando['mensagem'];
+                return $Resposta->resposta(200, $logando['mensagem']);
+
             } else {
 
-                $mensagem = $Resposta->modeloRespostaErro('credenciais_invalidas', 'E-mail ou senha incorretos.');
-                $codigo = 401;
+                return $Resposta->modeloRespostaErro(401,'E-mail ou senha incorretos.','credenciais_invalidas');
             }
         } else {
 
-            if ($data['email'] == null && $data['senha'] == null) {
+            $campos = ['email' => $email, 'senha' => $senha];
 
-                $mensagem = $Resposta->modeloRespostaErro('validação', 'Nenhum dado informado.');
-                $codigo = 400;
-            } else {
-
-                $campos = ['email' => $email, 'senha' => $senha];
-
-                $mensagem = $Resposta->modeloRespostaErro('validação', 'Preencha os campos obrigatórios destacados.', $campos);
-                $codigo = 422;
-            }
+            return $Resposta->modeloRespostaErro(422, 'Preencha os campos obrigatórios destacados.', 'validação', $campos);
         }
-
-        $resposta = $Resposta->resposta($codigo, $mensagem);
-
-        return $resposta;
     }
 
     public function cadastrar(array $data): array
@@ -64,56 +55,63 @@ class UsuariosController
         $Resposta = new Resposta;
 
         if (empty($data)) {
-            return $Resposta->resposta(400, [
-                'error' => 'Nenhum dado informado.'
-            ]);
+            return $Resposta->modeloRespostaErro(400,  'JSON mal formado.', 'validação');
         }
 
-        $nome = $data['nome'] ?? null;
-        $email = $data['email'] ?? null;
-        $senha = $data['senha'] ?? null;
+        $nome = isset($data['nome']) && trim($data['nome']) != '' ? trim($data['nome']) : null;
+        $email = isset($data['email']) && trim($data['email']) != '' ? trim($data['email']) : null;
+        $senha = isset($data['senha']) && trim($data['senha']) != '' ? trim($data['senha']) : null;
+        $codigoConvite = isset($data['convite_codigo']) && trim($data['convite_codigo']) != '' ? trim($data['convite_codigo']) : null;
+
         $idade = $data['idade'] ?? null;
-        $codigoConvite = $data['convite_codigo'] ?? null;
 
-        if ($nome == null || $email == null || $senha == null || !is_int($idade)) {
-            $Validacao = new Validacao;
+        $idadeValida = $idade === null || (
+            (is_string($idade) || is_int($idade)) && (
+                trim((string) $idade) === '' ||
+                preg_match('/^[0-9]{2}$/', trim((string) $idade)) === 1
+            )
+        );
 
-            $dados = [
-                'nome' => $nome,
-                'email' => $email,
-                'senha' => $senha,
-                'idade' => $idade
-            ];
+        if($idadeValida){
 
-            $arrayCampos = $Validacao->camposObrigatorios('cadastro', $dados);
+            if ($nome == null || $email == null || $senha == null) {
+                $Validacao = new Validacao;
+    
+                $dados = [
+                    'nome' => $nome,
+                    'email' => $email,
+                    'senha' => $senha,
+                ];
+    
+                $arrayCampos = $Validacao->camposObrigatorios('cadastro', $dados);
+    
+                return $Resposta->modeloRespostaErro(422,
+                    'Preencha os campos obrigatórios e confira os tipos informados.', 'validacao',
+                    $arrayCampos
+                );
+            }
+    
+            $UsuariosService = new UsuariosService;
+            $cadastrando = $UsuariosService->cadastrando($nome, $email, $senha, $idade, $codigoConvite);
+    
+            if($cadastrando['dados']){
+    
+                $mensagem = array_merge(['status' => $cadastrando["mensagem"]], $cadastrando["dados"]);
+    
+                return $Resposta->resposta(200, $mensagem);
+            }else {
+    
+                $erro = explode(' ', $cadastrando["mensagem"][2]);
+                $Utils = new Codigos;
+                $retorno = $Utils->codigo($cadastrando["mensagem"]);
+                $codigoErro = isset($erro[5]) == 'email' ? 'email_em_uso' : 'erro geral';
+                $mensagemErro = $codigoErro == 'email_em_uso' ? 'Já existe uma conta com esse e-mail.' : $Utils->codigo($cadastrando);
+                return $Resposta->modeloRespostaErro($retorno["http"], $mensagemErro, 'email em uso');
+            }
+        }  
 
-            $mensagem = $Resposta->modeloRespostaErro(
-                'validacao',
-                'Preencha os campos obrigatórios e confira os tipos informados.',
-                $arrayCampos
-            );
+        $array['idade'] = '';
 
-            return $Resposta->resposta(422, $mensagem);
-        }
-
-        $UsuariosService = new UsuariosService;
-        $cadastrando = $UsuariosService->cadastrando($nome, $email, $senha, $idade, $codigoConvite);
-
-        if($cadastrando['dados']){
-
-            $codigo = 200;
-            $mensagem = array_merge(['status' => $cadastrando["mensagem"]], $cadastrando["dados"]);
-        }else {
-
-            $erro = explode(' ', $cadastrando["mensagem"][2]);
-            $Utils = new Codigos;
-            $retorno = $Utils->codigo($cadastrando["mensagem"]);
-            $codigoErro = isset($erro[5]) == 'email' ? 'email_em_uso' : 'erro geral';
-            $mensagemErro = $codigoErro == 'email_em_uso' ? 'Já existe uma conta com esse e-mail.' : $Utils->codigo($cadastrando);
-            $codigo = $retorno["http"];
-            $mensagem = $Resposta->modeloRespostaErro($codigo, $mensagemErro);
-        }
-
-        return $Resposta->resposta($codigo, $mensagem);
+        return $Resposta->modeloRespostaErro(401, 'O caampo deve conter entre 1 à 3 dígitos numéricos.', 'validacao', $array);        
     }
 }

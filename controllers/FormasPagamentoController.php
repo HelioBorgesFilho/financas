@@ -16,9 +16,7 @@ class FormasPagamentoController {
         $Resposta = new Resposta;
 
         if (empty($data)) {
-
-            return $Resposta->modeloRespostaErro(400, 
-            'Requisição Malformada.');
+            return $Resposta->modeloRespostaErro(400,  'JSON mal formado.', 'validação');
         }
 
         $nome = $data['nome'] ?? null;
@@ -146,9 +144,7 @@ class FormasPagamentoController {
         $Resposta = new Resposta;
 
         if (empty($data)) {
-
-            return $Resposta->modeloRespostaErro(400, 
-            'Requisição Malformada.');
+            return $Resposta->modeloRespostaErro(400,  'JSON mal formado.', 'validação');
         }
 
         $digitoCartao = $data['digito_cartao'] ?? null;

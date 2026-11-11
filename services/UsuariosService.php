@@ -8,7 +8,7 @@ use models\Usuarios;
 class UsuariosService
 {
 
-    public function cadastrando(string $nome, string $email, string $senha, int $idade, ?string $codigoConvite) : array
+    public function cadastrando(string $nome, string $email, string $senha, ?int $idade, ?string $codigoConvite) : array
     {
 
         $Usuarios = new Usuarios;

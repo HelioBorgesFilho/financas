@@ -38,17 +38,20 @@ class Resposta {
         return $mensagem;
     }
 
-    public function modeloRespostaErro(int $codigo, $mensagem, $motivo = null, $campos = null): array {
+    public function modeloRespostaErro(int $codigo, $mensagem, ?string $motivo = null, $campos = null): array {
 
         $respostaErro = ['erro' => ['mensagem' => $mensagem]];
+
+        if($motivo == null){
+
+            $respostaErro = ['erro' => ['motivo' => $motivo,'mensagem' => $mensagem]];
+        }       
 
         if($campos){
 
             foreach($campos as $posicao => $campo){  
                 
                 if($campo == null){
-
-                    $respostaErro["erro"]["codigo"] = $motivo;
 
                     $respostaErro["erro"]['campos'][$posicao] = $this->mensagensPadraoErro($posicao);
                 }                
