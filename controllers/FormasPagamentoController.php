@@ -6,19 +6,19 @@ use controllers\Resposta;
 use models\Usuarios;
 use controllers\Validacao;
 use services\FormasPagamentoService;
+use models\FormaPagamento;
 
 class FormasPagamentoController {
 
-    public function cadastrarPagamento(array $data, string $acesso)
+    public function cadastrarPagamento(array $data)
     {
 
         $Resposta = new Resposta;
 
         if (empty($data)) {
 
-            $mensagem = $Resposta->modeloRespostaErro('sintaxe', 
+            return $Resposta->modeloRespostaErro(400, 
             'Requisição Malformada.');
-            return $Resposta->resposta(400, $mensagem);
         }
 
         $nome = $data['nome'] ?? null;
@@ -63,17 +63,125 @@ class FormasPagamentoController {
             $arrayCampos = $Validacao->camposObrigatorios('formaPagamento', $dados);
 
             $mensagem = $Resposta->modeloRespostaErro(
-                'validacao',
+                401,
                 'Preencha os campos obrigatórios e confira os tipos informados.',
+                'validacao',
                 $arrayCampos
             );
 
             if (!$digitoValido) {
-                $mensagem['erro']['campos']['digito_cartao'] =
+                $mensagem['mensagem']['erro']['campos']['digito_cartao'] =
                     'Deve conter exatamente 4 dígitos numéricos.';
             }
 
-            return $Resposta->resposta(422, $mensagem);
+            return $mensagem;
         }
-    }    
+    } 
+    
+    public function excluirPagamento($data){
+
+        $FormaPagamento = new FormaPagamento;
+        $Resposta = new Resposta;
+
+        $usuario = $_SESSION['usuario_id'];
+
+        $formas = $FormaPagamento->metodosPagamentos($usuario);
+
+        if(!empty($formas)) {
+
+            foreach($formas as $forma){
+
+                if($forma['id'] == $data[0] && $forma['deletada'] == 0){
+
+                    $excluir = $FormaPagamento->remover($data[0]);
+
+                    if($excluir['status']){
+
+                        return $Resposta->resposta(200, $excluir['mensagem']);
+                    }
+
+                    return $Resposta->modeloRespostaErro(500, 'Erro interno');
+                }
+            }
+
+            return $Resposta->modeloRespostaErro(404, 'Forma não encontrada, já excluída ou não pertencente ao usuário.');
+        }
+
+        return $Resposta->modeloRespostaErro(200, 'Não possue formas de pagamento cadastradas.');
+    }
+
+    public function listarPagamentos(){
+
+        $FormaPagamento = new FormaPagamento;
+        $Resposta = new Resposta;
+
+        $usuario = $_SESSION['usuario_id'];
+
+        $formas = $FormaPagamento->metodosPagamentos($usuario);
+
+        if(!empty($formas)) {
+
+            $opcoesFormas = [];
+
+            foreach($formas as $posicao => $forma){
+
+                $opcoesFormas[$posicao] = ['id' => $forma['id'], 'nome' => $forma['nome'], 'tipo' => $forma['tipo']];
+
+                if($forma['digito_cartao'] != null){
+                    $opcoesFormas[$posicao]['digito_cartao'] = $forma['digito_cartao'];
+                }
+                if($forma['apelido_cartao'] != null){
+                    $opcoesFormas[$posicao]['apelido_cartao'] = $forma['apelido_cartao'];
+                }
+            }
+
+            return $Resposta->resposta(200, $opcoesFormas);
+        }
+
+        return $Resposta->modeloRespostaErro(200, []);
+    }
+
+    public function editarPagamentos(array $data){
+
+        $Resposta = new Resposta;
+
+        if (empty($data)) {
+
+            $mensagem = $Resposta->modeloRespostaErro('sintaxe', 
+            'Requisição Malformada.');
+            return $Resposta->resposta(400, $mensagem);
+        }
+
+        $digitoCartao = $data['digito_cartao'] ?? null;
+
+        $digitoValido = $digitoCartao === null || (
+            is_string($digitoCartao) && (
+                trim($digitoCartao) === '' ||
+                preg_match('/^[0-9]{4}$/', trim($digitoCartao)) === 1
+            )
+        );
+
+        if($digitoValido){
+
+            $FormasPagamentoService = new FormasPagamentoService;
+
+            $atualizar = $FormasPagamentoService->atualizarFormaPagamento($data);
+
+            if ($atualizar['status']) {
+
+                return $Resposta->resposta($atualizar['codigo'], $atualizar['mensagem']);
+            }
+
+            return $Resposta->modeloRespostaErro($atualizar['codigo'], $atualizar['mensagem']);
+
+        } else {
+
+            if (!$digitoValido) {
+
+                $array['digito_cartao'] = '';
+
+                return $Resposta->modeloRespostaErro(400, 'Um ou mais erros encontrados:', $array);
+            }
+        }        
+    }
 }
