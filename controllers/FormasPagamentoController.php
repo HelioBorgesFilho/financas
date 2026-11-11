@@ -123,14 +123,14 @@ class FormasPagamentoController {
 
             $opcoesFormas = [];
 
-            foreach($formas as $posicao => $forma){
+            foreach ($formas as $posicao => $forma) {
 
                 $opcoesFormas[$posicao] = ['id' => $forma['id'], 'nome' => $forma['nome'], 'tipo' => $forma['tipo']];
 
-                if($forma['digito_cartao'] != null){
+                if ($forma['digito_cartao'] != null) {
                     $opcoesFormas[$posicao]['digito_cartao'] = $forma['digito_cartao'];
                 }
-                if($forma['apelido_cartao'] != null){
+                if ($forma['apelido_cartao'] != null) {
                     $opcoesFormas[$posicao]['apelido_cartao'] = $forma['apelido_cartao'];
                 }
             }
@@ -141,15 +141,14 @@ class FormasPagamentoController {
         return $Resposta->modeloRespostaErro(200, []);
     }
 
-    public function editarPagamentos(array $data){
+    public function editarPagamentos(int $idForma, array $data){
 
         $Resposta = new Resposta;
 
         if (empty($data)) {
 
-            $mensagem = $Resposta->modeloRespostaErro('sintaxe', 
+            return $Resposta->modeloRespostaErro(400, 
             'Requisição Malformada.');
-            return $Resposta->resposta(400, $mensagem);
         }
 
         $digitoCartao = $data['digito_cartao'] ?? null;
@@ -164,6 +163,8 @@ class FormasPagamentoController {
         if($digitoValido){
 
             $FormasPagamentoService = new FormasPagamentoService;
+
+            $data['id'] = $idForma;
 
             $atualizar = $FormasPagamentoService->atualizarFormaPagamento($data);
 
@@ -180,7 +181,7 @@ class FormasPagamentoController {
 
                 $array['digito_cartao'] = '';
 
-                return $Resposta->modeloRespostaErro(400, 'Um ou mais erros encontrados:', $array);
+                return $Resposta->modeloRespostaErro(400, 'Um ou mais erros encontrados:', 'validação', $array);
             }
         }        
     }

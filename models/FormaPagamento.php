@@ -139,7 +139,8 @@ class FormaPagamento
     public function metodosPagamentos(int $id) : array
     {
 
-        $sql = 'SELECT * FROM forma_pagamento WHERE usuario_criador = :id';
+        $sql = 'SELECT * FROM forma_pagamento
+        WHERE usuario_criador = :id AND deletada = 0';
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
         $stmt->execute();

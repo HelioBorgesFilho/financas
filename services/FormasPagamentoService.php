@@ -66,7 +66,7 @@ class FormasPagamentoService {
 
         if (!empty($forma["dados"])) {
 
-            if ($forma["dados"]["id"] == $data['id']) {
+            if ($forma["dados"]["id"] == $data['id'] && $forma["dados"]["usuario_criador"] == $usuario && $forma["dados"]["deletada"] == 0) {
 
                 $data['nome'] = isset($data['nome']) && trim($data['nome']) !== '' ? trim($data['nome']) : $forma["dados"]['nome'];
                 $data['tipo'] = isset($data['tipo']) && trim($data['tipo']) !== '' ? trim($data['tipo']) : $forma["dados"]["tipo"];

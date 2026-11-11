@@ -20,7 +20,7 @@ class Controller
         return true;
     }
 
-    public function mainController($option, $data = [])
+    public function mainController($option, $data = [], $id = null)
     {
         $AuthMiddleware = new AuthMiddleware;
         $Resposta = new Resposta;
@@ -131,7 +131,7 @@ class Controller
 
                     $FormasPagamentoController = new FormasPagamentoController;
 
-                    $resposta = $FormasPagamentoController->editarPagamentos($data);
+                    $resposta = $FormasPagamentoController->editarPagamentos($id, $data);
                 } else {
 
                     return $Resposta->modeloRespostaErro(

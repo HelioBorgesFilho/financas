@@ -419,9 +419,9 @@ switch ($method) {
 
                 if ($numberOfRoute === 3 && ctype_digit($route[2]) && (int) $route[2] > 0) {
 
-                    $content['id'] = $route[2];
+                    $idForma = $route[2];
 
-                    $response = $controller->mainController('editarFormaPagamento', $content);
+                    $response = $controller->mainController('editarFormaPagamento', $content, $idForma);
                 } else {
                     $response = $controller->mainController('error');
                 }
