@@ -45,7 +45,7 @@ class UsuariosController
 
             $campos = ['email' => $email, 'senha' => $senha];
 
-            return $Resposta->modeloRespostaErro(422, 'Preencha os campos obrigatórios destacados.', 'validação', $campos);
+            return $Resposta->modeloRespostaErro(422, 'Preencha os campos obrigatórios destacados.', 'validação', 'log', $campos);
         }
     }
 
@@ -77,17 +77,12 @@ class UsuariosController
             if ($nome == null || $email == null || $senha == null) {
                 $Validacao = new Validacao;
     
-                $dados = [
-                    'nome' => $nome,
-                    'email' => $email,
-                    'senha' => $senha,
-                ];
-    
-                $arrayCampos = $Validacao->camposObrigatorios('cadastro', $dados);
+                $arrayCampos = $Validacao->camposObrigatorios('cadastro', $data);
     
                 return $Resposta->modeloRespostaErro(422,
                     'Preencha os campos obrigatórios e confira os tipos informados.', 'validacao',
-                    $arrayCampos
+                    'cadastroUsuario',
+                    $arrayCampos["dados"]
                 );
             }
     
@@ -112,6 +107,6 @@ class UsuariosController
 
         $array['idade'] = '';
 
-        return $Resposta->modeloRespostaErro(401, 'O caampo deve conter entre 1 à 3 dígitos numéricos.', 'validacao', $array);        
+        return $Resposta->modeloRespostaErro(401, 'O campo deve conter entre 1 à 3 dígitos numéricos.', 'validacao', 'cadastroUsuario', $array);        
     }
 }

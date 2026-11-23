@@ -53,18 +53,14 @@ class FormasPagamentoController {
 
             $Validacao = new Validacao;
 
-            $dados = [
-                'nome' => is_string($nome) ? trim($nome) : null,
-                'tipo' => is_string($tipo) ? trim($tipo) : null,
-            ];
-
-            $arrayCampos = $Validacao->camposObrigatorios('formaPagamento', $dados);
+            $arrayCampos = $Validacao->camposObrigatorios('cadastrarFormaPagamento', $data);
 
             $mensagem = $Resposta->modeloRespostaErro(
                 401,
                 'Preencha os campos obrigatórios e confira os tipos informados.',
                 'validacao',
-                $arrayCampos
+                'cadastrarFormaPagamento',
+                $arrayCampos["dados"]
             );
 
             if (!$digitoValido) {
@@ -177,7 +173,7 @@ class FormasPagamentoController {
 
                 $array['digito_cartao'] = '';
 
-                return $Resposta->modeloRespostaErro(400, 'Um ou mais erros encontrados:', 'validação', $array);
+                return $Resposta->modeloRespostaErro(400, 'Um ou mais erros encontrados:', 'validação', 'editarFormaPagamento', $array);
             }
         }        
     }

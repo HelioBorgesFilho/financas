@@ -9,22 +9,28 @@ class Resposta {
         return ['codigo' => $codigo, 'mensagem' => $mensagem];
     }
 
-    public function mensagensPadraoErro($nomeMensagem): string{
+    public function mensagensPadraoErro(string $acao, $nomeMensagem): string{
 
         $mensagens = [
-            'nome' => 'Informe um nome com pelo menos 2 letras.',
-            'email' => 'Informe o e-mail.',
-            'senha' => 'Use pelo menos 8 caracteres.', 
-            'idade' => 'Informe sua idade.',
-            'tipo' => 'Escolha o tipo da forma de pagamento.',
-            'digito_cartao' => 'Deve conter exatamente 4 dígitos numéricos.'
+
+            'cadastroUsuario' => ['nome' => 'Informe um nome com pelo menos 2 letras.', 'email' => 'Informe o e-mail.', 'senha' => 'Use pelo menos 8 caracteres.', 'idade' => 'Informe sua idade.',],
+
+            'editarFormaPagamento' => ['digito_cartao' => 'Deve conter exatamente 4 dígitos numéricos.'],
+
+            'log' => ['email' => 'Informe o e-mail.', 'senha' => 'Use pelo menos 8 caracteres.'],
+
+            'cadastrarFormaPagamento' => ['email' => 'Informe o e-mail.', 'tipo' => 'Escolha o tipo da forma de pagamento.'],
+
+            'lancamento' => ['tipo' => 'Escolha um tipo.', 'descricao' => 'Escolha uma descrição.', 'local' => 'Escolha uma descrição.', 'valor_centavos' => 'Escolha uma descrição.', 'forma_pagamento_id' => 'Escolha uma descrição.', 'data' => 'Escolha uma descrição.', 'categoria' => 'Escolha uma descrição.', 'em_nome_de_id' => 'Escolha uma descrição.', 'lancado_por_id' => 'Escolha uma descrição.'],
+
+            'despesa' => ['tipo' => 'Escolha uma descrição.', 'descricao' => 'Escolha uma descrição.', 'valor_centavos' => 'Escolha uma descrição.', 'data' => 'Escolha uma descrição.', 'categoria' => 'Escolha uma descrição.', 'em_nome_de_id' => 'Escolha uma descrição.', 'lancado_por_id' => 'Escolha uma descrição.'],
         ];
 
         $mensagem = '';
 
-        foreach($mensagens as $posicao => $msg){
+        foreach($mensagens[$acao] as $posicao => $msg){
 
-            if(isset($mensagens[$posicao])){
+            if(isset($mensagens[$acao][$posicao])){
 
                 if($posicao == $nomeMensagem){
 
@@ -32,17 +38,17 @@ class Resposta {
                 }
             }else{
 
-                $mensagem = 'Campo não encontrado, contato desenvolvedor.';
+                $mensagem = 'Campo não encontrado, informe ao desenvolvedor.';
             }
         }
         return $mensagem;
     }
 
-    public function modeloRespostaErro(int $codigo, $mensagem, ?string $motivo = null, $campos = null): array {
+    public function modeloRespostaErro(int $codigo, $mensagem, ?string $motivo = null, ?string $acao = null, $campos = null): array {
 
         $respostaErro = ['erro' => ['mensagem' => $mensagem]];
 
-        if($motivo == null){
+        if($motivo != null){
 
             $respostaErro = ['erro' => ['motivo' => $motivo,'mensagem' => $mensagem]];
         }       
@@ -51,9 +57,9 @@ class Resposta {
 
             foreach($campos as $posicao => $campo){  
                 
-                if($campo == null){
+                if(trim($campo) == null){
 
-                    $respostaErro["erro"]['campos'][$posicao] = $this->mensagensPadraoErro($posicao);
+                    $respostaErro["erro"]['campos'][$posicao] = $this->mensagensPadraoErro($acao, $posicao);
                 }                
             }
         }

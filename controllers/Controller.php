@@ -7,7 +7,7 @@ use controllers\Resposta;
 use controllers\UsuariosController;
 use services\AuthService;
 use controllers\FormasPagamentoController;
-use services\UsuarioFormaPagamentoService;
+use controllers\LancamentoController;
 
 class Controller
 {
@@ -132,6 +132,25 @@ class Controller
                     $FormasPagamentoController = new FormasPagamentoController;
 
                     $resposta = $FormasPagamentoController->editarPagamentos($id, $data);
+                } else {
+
+                    return $Resposta->modeloRespostaErro(
+                        $acesso['codigo'],
+                        $acesso['mensagem'],
+                    );
+                }
+
+                break;
+
+            case 'lancar':
+
+                $acesso = $AuthMiddleware->validarAcesso();
+
+                if ($acesso['status']) {
+
+                    $LancamentoController = new LancamentoController;
+
+                    $resposta = $LancamentoController->verificarLancamento($data);
                 } else {
 
                     return $Resposta->modeloRespostaErro(

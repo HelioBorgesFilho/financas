@@ -29,7 +29,7 @@ switch ($method) {
 
                 if ($numberOfRoute === 2) {
 
-                    $response = $controller->resposta(200, '/lancamentos'); // teste, remover depois
+                    $response = $controller->mainController('lancar', $content); // teste, remover depois
 
                 } else {
                     $response = $controller->mainController('error');

@@ -9,38 +9,32 @@ class Validacao {
         $campos = [
             'cadastro' => ['nome' => 'obrigatorio', 'email' => 'obrigatorio', 'senha' => 'obrigatorio'],
             'login' => ['nome' => 'obrigatorio', 'email' => 'obrigatorio', 'senha' => 'obrigatorio'],
-            'formaPagamento' => ['nome' => 'obrigatorio', 'tipo' => 'obrigatorio'],
+            'cadastrarFormaPagamento' => ['nome' => 'obrigatorio', 'tipo' => 'obrigatorio'],
+            'lancamento' => ['tipo' => 'obrigatorio', 'descricao' => 'obrigatorio', 'local' => 'obrigatorio', 'valor_centavos' => 'obrigatorio', 'forma_pagamento_id' => 'obrigatorio', 'data' => 'obrigatorio', 'categoria' => 'obrigatorio', 'em_nome_de_id' => 'obrigatorio', 'lancado_por_id' => 'obrigatorio'],
+            'despesa' => ['tipo' => 'obrigatorio', 'descricao' => 'obrigatorio', 'valor_centavos' => 'obrigatorio', 'data' => 'obrigatorio', 'categoria' => 'obrigatorio', 'em_nome_de_id' => 'obrigatorio', 'lancado_por_id' => 'obrigatorio'],
         ];
 
         $campoSelecionado = [];
 
-        foreach($campos as $posicao => $campo){
+        foreach($campos[$requisicao] as $posicao => $campo){
 
-            if($campos[$posicao]){
+            if(isset($dados[$posicao])){
 
-                if($posicao == $requisicao){
+                if(trim($dados[$posicao]) == null){
 
-                    $campoSelecionado = $campo;
+                    $campoSelecionado[$posicao] = '';
                 }
-            }else{
+            } else {
 
-                $campoSelecionado = $campo;
-            }            
+                if($campo == 'obrigatorio'){
+
+                    $campoSelecionado[$posicao] = '';
+                }
+            }        
         }
 
-        $arrayRetorno = [];
+        $validado = empty($campoSelecionado) ? true : false;
 
-        foreach($dados as $posicao => $dado){
-
-            if($campoSelecionado[$posicao] == 'obrigatorio'){
-
-                if($dado == null){
-
-                    $arrayRetorno[$posicao] = $dado;
-                }
-            }
-        }
-
-        return $arrayRetorno;
+        return ['validado' => $validado, 'dados' => $campoSelecionado];
     }
 }
